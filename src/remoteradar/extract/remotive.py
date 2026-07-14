@@ -82,12 +82,18 @@ def fetch_jobs(
 
 def main() -> None:
     """Fetch tech jobs from Remotive and store the raw payload in PostgreSQL."""
-    from remoteradar.config import load_env
+    import sys
+
+    from remoteradar.config import ConfigError, database_url, load_env
     from remoteradar.load import insert_raw_remotive_payload
 
     load_env()
-    payload = fetch_jobs()
-    row_id = insert_raw_remotive_payload(payload)
+    try:
+        dsn = database_url()  # fail fast: valida a config antes de chamar a API
+        payload = fetch_jobs()
+        row_id = insert_raw_remotive_payload(payload, dsn=dsn)
+    except (ConfigError, RemotiveError) as exc:
+        sys.exit(f"Erro: {exc}")
     print(
         f"Payload bruto da Remotive salvo em raw.remotive_jobs (id={row_id}, "
         f"{len(payload['jobs'])} vagas)."
