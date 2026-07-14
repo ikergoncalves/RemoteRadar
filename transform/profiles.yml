@@ -1,0 +1,19 @@
+# Connection profile for the RemoteRadar dbt project. Safe to commit: every
+# value comes from an environment variable (with local-friendly defaults).
+# These variables mirror the components of DATABASE_URL — dbt-postgres does
+# not accept a single connection string. Note that dbt does NOT read .env
+# files; export the DBT_PG_* variables in your shell before running dbt
+# (see .env.example for the list).
+
+remoteradar:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_PG_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PG_PORT', '5432') | as_number }}"
+      user: "{{ env_var('DBT_PG_USER', 'postgres') }}"
+      password: "{{ env_var('DBT_PG_PASSWORD', '') }}"
+      dbname: "{{ env_var('DBT_PG_DBNAME', 'remoteradar') }}"
+      schema: "{{ env_var('DBT_PG_SCHEMA', 'analytics') }}"
+      threads: 4

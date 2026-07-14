@@ -1,0 +1,133 @@
+version: 2
+
+models:
+  - name: stg_remotive_jobs
+    description: >
+      One row per Remotive job posting, parsed from the consolidated JSONB
+      payloads in raw.remotive_jobs. When the same job appears in several
+      extraction runs, only the most recent ingestion is kept.
+    columns:
+      - name: job_id
+        description: Remotive job id (payload jobs[].id), kept as text.
+        tests:
+          - not_null
+          - unique
+      - name: source
+        description: Constant 'remotive' (from the raw table's source column).
+        tests:
+          - not_null
+      - name: title
+        description: Job title (jobs[].title).
+        tests:
+          - not_null
+      - name: company
+        description: Company name (jobs[].company_name).
+      - name: category
+        description: Remotive category display name (jobs[].category), e.g. "Software Development".
+      - name: tags
+        description: Skill/technology tags as a JSONB array (jobs[].tags).
+      - name: location
+        description: Required candidate location (jobs[].candidate_required_location); often a region like "Worldwide" or "USA Only".
+      - name: salary_min
+        description: Always null — Remotive only provides free-text salary.
+      - name: salary_max
+        description: Always null — Remotive only provides free-text salary.
+      - name: salary_text
+        description: Free-text salary description (jobs[].salary), null when empty.
+      - name: published_at
+        description: Publication timestamp (jobs[].publication_date, naive UTC in the API, cast to timestamptz).
+      - name: url
+        description: Job posting URL on Remotive (jobs[].url).
+      - name: ingested_at
+        description: When the payload containing this job version was ingested.
+      - name: raw_id
+        description: Id of the raw.remotive_jobs row this job was parsed from.
+
+  - name: stg_remoteok_jobs
+    description: >
+      One row per RemoteOK job posting, parsed from the consolidated JSONB
+      payloads in raw.remoteok_jobs. When the same job appears in several
+      extraction runs, only the most recent ingestion is kept.
+    columns:
+      - name: job_id
+        description: RemoteOK job id (payload jobs[].id, a numeric string in the API), kept as text.
+        tests:
+          - not_null
+          - unique
+      - name: source
+        description: Constant 'remoteok' (from the raw table's source column).
+        tests:
+          - not_null
+      - name: title
+        description: Job title (jobs[].position).
+        tests:
+          - not_null
+      - name: company
+        description: Company name (jobs[].company).
+      - name: category
+        description: Always null — RemoteOK has no category field; use tags instead.
+      - name: tags
+        description: Skill/technology tags as a JSONB array (jobs[].tags); this is RemoteOK's only categorization.
+      - name: location
+        description: Free-text location (jobs[].location), null when empty.
+      - name: salary_min
+        description: Lower salary bound in USD/year (jobs[].salary_min, a numeric string; "0" means not provided and becomes null).
+      - name: salary_max
+        description: Upper salary bound in USD/year (jobs[].salary_max, a numeric string; "0" means not provided and becomes null).
+      - name: salary_text
+        description: Always null — RemoteOK only provides numeric bounds.
+      - name: published_at
+        description: Publication timestamp (jobs[].date, ISO-8601 with timezone).
+      - name: url
+        description: Job posting URL on RemoteOK (jobs[].url).
+      - name: ingested_at
+        description: When the payload containing this job version was ingested.
+      - name: raw_id
+        description: Id of the raw.remoteok_jobs row this job was parsed from.
+
+  - name: stg_adzuna_jobs
+    description: >
+      One row per Adzuna job posting (category it-jobs), parsed from the
+      consolidated JSONB payloads in raw.adzuna_jobs. When the same job
+      appears in several extraction runs, only the most recent ingestion is
+      kept.
+    columns:
+      - name: job_id
+        description: Adzuna ad id (payload jobs[].id), kept as text.
+        tests:
+          - not_null
+          - unique
+      - name: source
+        description: Constant 'adzuna' (from the raw table's source column).
+        tests:
+          - not_null
+      - name: title
+        description: Job title (jobs[].title).
+        tests:
+          - not_null
+      - name: company
+        description: Company display name (jobs[].company.display_name).
+      - name: category
+        description: Adzuna category label (jobs[].category.label); "IT Jobs" for this pipeline's searches.
+      - name: tags
+        description: Always null — Adzuna has no tag field; use category instead.
+      - name: location
+        description: Location display name (jobs[].location.display_name), e.g. "London, UK".
+      - name: salary_min
+        description: Lower salary bound in the search country's currency (jobs[].salary_min).
+      - name: salary_max
+        description: Upper salary bound in the search country's currency (jobs[].salary_max).
+      - name: salary_text
+        description: Always null — Adzuna only provides numeric bounds.
+      - name: salary_is_predicted
+        description: True when the salary was estimated by Adzuna's model rather than stated in the ad (jobs[].salary_is_predicted).
+      - name: published_at
+        description: Ad creation timestamp (jobs[].created, ISO-8601).
+      - name: url
+        description: Redirect URL to the job ad (jobs[].redirect_url).
+      - name: search_country
+        description: Country code the search ran against (payload.country; pipeline default gb).
+      - name: ingested_at
+        description: When the payload containing this job version was ingested.
+      - name: raw_id
+        description: Id of the raw.adzuna_jobs row this job was parsed from.

@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Landing schema populated by the Python extraction pipeline
+      (python -m remoteradar.pipeline). One row per extraction run per
+      source, holding the consolidated API payload as JSONB. DDL lives in
+      the repository's sql/ directory.
+    schema: raw
+    tables:
+      - name: remotive_jobs
+        description: >
+          Consolidated Remotive payloads. payload->'jobs' is the deduplicated
+          job list across the tech categories; payload->'fetched-categories'
+          and payload->'failed-categories' record per-category outcomes.
+      - name: remoteok_jobs
+        description: >
+          Consolidated RemoteOK payloads. payload->'jobs' is the deduplicated
+          job list across the tech tags; payload->'fetched-tags' and
+          payload->'failed-tags' record per-tag outcomes.
+      - name: adzuna_jobs
+        description: >
+          Consolidated Adzuna payloads (category it-jobs). payload->'jobs' is
+          the deduplicated result list across search pages;
+          payload->'fetched-pages', payload->'failed-pages' and
+          payload->'country' record the run's paging outcome.
