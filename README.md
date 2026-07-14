@@ -1,96 +1,97 @@
 # RemoteRadar
 
-Pipeline de ETL em Python que coleta vagas remotas de tecnologia de APIs públicas,
-limpa e transforma os dados, carrega num data warehouse PostgreSQL e — nas próximas
-fases — gera um dashboard de tendências: linguagens mais pedidas, faixas salariais,
-empresas que mais contratam remoto e evolução ao longo do tempo.
+Python ETL pipeline that collects remote tech job postings from public APIs,
+cleans and transforms the data, loads it into a PostgreSQL data warehouse and —
+in upcoming phases — powers a trends dashboard: most requested languages,
+salary ranges, companies hiring remote the most, and evolution over time.
 
-> **Projeto em fases.** Esta é a Fase 1 de 7: estrutura do repositório e extração
-> da primeira fonte (Remotive), salvando o payload bruto no schema `raw` do
-> PostgreSQL. Novas fontes (RemoteOK, Adzuna), transformações e o dashboard
-> chegam nas fases seguintes.
+> **Phased project.** This is Phase 1 of 7: repository structure and extraction
+> of the first source (Remotive), storing the raw payload in the `raw` schema
+> of PostgreSQL. New sources (RemoteOK, Adzuna), transformations and the
+> dashboard arrive in the next phases.
 
-## Stack planejada
+## Planned stack
 
-| Camada              | Ferramenta                                      |
+| Layer               | Tool                                            |
 | ------------------- | ----------------------------------------------- |
-| Extração            | Python + [httpx](https://www.python-httpx.org/) |
-| Orquestração        | Prefect (open-source)                           |
-| Transformação       | dbt-core                                        |
-| Warehouse           | PostgreSQL (Supabase ou Railway free tier)      |
-| Qualidade de dados  | Great Expectations                              |
+| Extraction          | Python + [httpx](https://www.python-httpx.org/) |
+| Orchestration       | Prefect (open-source)                           |
+| Transformation      | dbt-core                                        |
+| Warehouse           | PostgreSQL (Supabase or Railway free tier)      |
+| Data quality        | Great Expectations                              |
 | Dashboard           | Streamlit (Streamlit Community Cloud)           |
-| Testes              | Pytest                                          |
-| CI / Agendamento    | GitHub Actions (cron diário)                    |
+| Testing             | Pytest                                          |
+| CI / Scheduling     | GitHub Actions (daily cron)                     |
 
-## Estrutura atual
+## Current structure
 
 ```
 remoteradar/
 ├── src/remoteradar/
-│   ├── config.py            # Leitura de variáveis de ambiente (.env)
-│   ├── load.py              # Carga de payloads brutos no PostgreSQL
+│   ├── config.py            # Environment variable handling (.env)
+│   ├── load.py              # Raw payload loading into PostgreSQL
 │   └── extract/
-│       └── remotive.py      # Extração da API da Remotive
+│       └── remotive.py      # Remotive API extraction
 ├── sql/
-│   └── 001_create_raw_remotive_jobs.sql   # DDL da tabela de landing
-├── tests/                   # Testes com HTTP mockado (não bate na API real)
-├── .env.example             # Variáveis de ambiente documentadas
-└── pyproject.toml           # Dependências e configuração de ferramentas
+│   └── 001_create_raw_remotive_jobs.sql   # Landing table DDL
+├── tests/                   # Tests with mocked HTTP (never hits the real API)
+├── .env.example             # Documented environment variables
+└── pyproject.toml           # Dependencies and tool configuration
 ```
 
-## Como rodar localmente
+## Running locally
 
-Requer Python 3.11+.
+Requires Python 3.11+.
 
 ```bash
-# 1. Criar e ativar o ambiente virtual
+# 1. Create and activate the virtual environment
 python -m venv .venv
 .venv\Scripts\activate        # Windows
 # source .venv/bin/activate   # Linux/macOS
 
-# 2. Instalar o projeto com dependências de desenvolvimento
+# 2. Install the project with development dependencies
 pip install -e ".[dev]"
 
-# 3. Configurar variáveis de ambiente
-# Copie .env.example para .env e preencha DATABASE_URL
+# 3. Configure environment variables
+# Copy .env.example to .env and fill in DATABASE_URL
 ```
 
-### Variáveis de ambiente
+### Environment variables
 
-| Variável           | Obrigatória | Descrição                                                        |
-| ------------------ | ----------- | ---------------------------------------------------------------- |
-| `DATABASE_URL`     | Sim (carga) | String de conexão do PostgreSQL (`postgresql://user:pass@host:5432/db`) |
-| `REMOTIVE_API_URL` | Não         | URL base da API da Remotive (padrão: endpoint público)           |
+| Variable           | Required   | Description                                                              |
+| ------------------ | ---------- | ------------------------------------------------------------------------ |
+| `DATABASE_URL`     | Yes (load) | PostgreSQL connection string (`postgresql://user:pass@host:5432/db`)     |
+| `REMOTIVE_API_URL` | No         | Remotive API base URL (default: public endpoint)                         |
 
-### Criar a tabela raw no PostgreSQL
+### Create the raw table in PostgreSQL
 
 ```bash
 psql "$DATABASE_URL" -f sql/001_create_raw_remotive_jobs.sql
 ```
 
-### Executar a extração
+### Run the extraction
 
 ```bash
 python -m remoteradar.extract.remotive
 ```
 
-Busca as vagas das categorias tech da Remotive (Software Development,
-Artificial Intelligence, Data and Analytics, Devops, Quality Assurance e
-Information Technology — uma chamada por categoria), consolida tudo num único
-payload e insere o resultado (JSONB) em `raw.remotive_jobs`, com timestamp de
-coleta. Se uma categoria falhar, o erro é logado e a extração segue com as
-demais, registrando as falhas no campo `failed-categories` do payload salvo;
-só aborta se todas falharem. Sem `DATABASE_URL` configurada, o script falha
-com uma mensagem de erro explicando como corrigir.
+Fetches job postings from Remotive's tech categories (Software Development,
+Artificial Intelligence, Data and Analytics, Devops, Quality Assurance and
+Information Technology — one call per category), consolidates everything into
+a single payload and inserts the result (JSONB) into `raw.remotive_jobs`, with
+an ingestion timestamp. If one category fails, the error is logged and the
+extraction continues with the remaining ones, recording the failures in the
+`failed-categories` field of the stored payload; it only aborts if all of them
+fail. Without `DATABASE_URL` configured, the script fails with an error
+message explaining how to fix it.
 
-### Testes e lint
+### Tests and lint
 
 ```bash
 pytest
 ruff check .
 ```
 
-## Licença
+## License
 
 [MIT](LICENSE)

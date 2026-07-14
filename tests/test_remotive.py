@@ -83,19 +83,19 @@ def test_fetch_jobs_error_status_raises_remotive_error(status_code: int) -> None
 
 def test_fetch_jobs_non_json_body_raises_remotive_error() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, content=b"<html>definitivamente nao e JSON</html>")
+        return httpx.Response(200, content=b"<html>definitely not JSON</html>")
 
     with make_client(handler) as client:
-        with pytest.raises(RemotiveError, match="nao-JSON"):
+        with pytest.raises(RemotiveError, match="non-JSON"):
             fetch_jobs(client=client, api_url=API_URL)
 
 
 def test_fetch_jobs_unexpected_shape_raises_remotive_error() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={"detail": "sem lista de jobs aqui"})
+        return httpx.Response(200, json={"detail": "no jobs list here"})
 
     with make_client(handler) as client:
-        with pytest.raises(RemotiveError, match="Formato inesperado"):
+        with pytest.raises(RemotiveError, match="Unexpected shape"):
             fetch_jobs(client=client, api_url=API_URL)
 
 
@@ -119,9 +119,9 @@ def test_fetch_tech_jobs_aggregates_all_categories() -> None:
 
 
 def test_fetch_tech_jobs_filters_and_dedups_when_api_ignores_category() -> None:
-    # A API da Remotive vem ignorando o filtro server-side e devolvendo o feed
-    # completo em toda chamada; o consolidado deve manter so as categorias
-    # pedidas, sem duplicar vagas entre as chamadas.
+    # The Remotive API has been ignoring the server-side filter and returning
+    # the full feed on every call; the consolidated payload must keep only the
+    # requested categories, without duplicating jobs across calls.
     full_feed = (
         JOBS_BY_CATEGORY["software-development"]
         + JOBS_BY_CATEGORY["data"]
@@ -163,5 +163,5 @@ def test_fetch_tech_jobs_all_categories_failing_raises_remotive_error() -> None:
         return httpx.Response(500)
 
     with make_client(handler) as client:
-        with pytest.raises(RemotiveError, match="Todas as categorias falharam"):
+        with pytest.raises(RemotiveError, match="All categories failed"):
             fetch_tech_jobs(TEST_CATEGORIES, client=client, api_url=API_URL)

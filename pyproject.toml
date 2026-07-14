@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "remoteradar"
 version = "0.1.0"
-description = "Pipeline de ETL que coleta vagas remotas de tech de APIs públicas e carrega num warehouse PostgreSQL."
+description = "ETL pipeline that collects remote tech job postings from public APIs and loads them into a PostgreSQL warehouse."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

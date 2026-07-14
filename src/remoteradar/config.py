@@ -32,8 +32,8 @@ def database_url() -> str:
     url = os.environ.get("DATABASE_URL")
     if not url:
         raise ConfigError(
-            "DATABASE_URL nao esta configurada. Copie .env.example para .env e preencha a "
-            "string de conexao do PostgreSQL "
-            "(formato: postgresql://usuario:senha@host:5432/nome_do_banco)."
+            "DATABASE_URL is not set. Copy .env.example to .env and fill in the "
+            "PostgreSQL connection string "
+            "(format: postgresql://user:password@host:5432/database_name)."
         )
     return url

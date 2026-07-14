@@ -36,5 +36,5 @@ def insert_raw_remotive_payload(payload: dict[str, Any], *, dsn: str | None = No
         cur.execute(_INSERT_RAW_REMOTIVE, (Jsonb(payload),))
         row = cur.fetchone()
         if row is None:  # defensive: RETURNING always yields one row on success
-            raise psycopg.DataError("INSERT ... RETURNING nao retornou id")
+            raise psycopg.DataError("INSERT ... RETURNING did not return an id")
         return int(row[0])
