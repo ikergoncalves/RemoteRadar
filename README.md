@@ -75,9 +75,14 @@ psql "$DATABASE_URL" -f sql/001_create_raw_remotive_jobs.sql
 python -m remoteradar.extract.remotive
 ```
 
-Busca as vagas de tech na Remotive e insere o payload bruto (JSONB) em
-`raw.remotive_jobs`, com timestamp de coleta. Sem `DATABASE_URL` configurada,
-o script falha com uma mensagem de erro explicando como corrigir.
+Busca as vagas das categorias tech da Remotive (Software Development,
+Artificial Intelligence, Data and Analytics, Devops, Quality Assurance e
+Information Technology — uma chamada por categoria), consolida tudo num único
+payload e insere o resultado (JSONB) em `raw.remotive_jobs`, com timestamp de
+coleta. Se uma categoria falhar, o erro é logado e a extração segue com as
+demais, registrando as falhas no campo `failed-categories` do payload salvo;
+só aborta se todas falharem. Sem `DATABASE_URL` configurada, o script falha
+com uma mensagem de erro explicando como corrigir.
 
 ### Testes e lint
 
