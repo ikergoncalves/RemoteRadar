@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 
 DEFAULT_REMOTIVE_API_URL = "https://remotive.com/api/remote-jobs"
+DEFAULT_REMOTEOK_API_URL = "https://remoteok.com/api"
 
 
 class ConfigError(RuntimeError):
@@ -21,6 +22,11 @@ def load_env() -> None:
 def remotive_api_url() -> str:
     """Base URL of the Remotive API (REMOTIVE_API_URL, with a public default)."""
     return os.environ.get("REMOTIVE_API_URL") or DEFAULT_REMOTIVE_API_URL
+
+
+def remoteok_api_url() -> str:
+    """Base URL of the RemoteOK API (REMOTEOK_API_URL, with a public default)."""
+    return os.environ.get("REMOTEOK_API_URL") or DEFAULT_REMOTEOK_API_URL
 
 
 def database_url() -> str:
