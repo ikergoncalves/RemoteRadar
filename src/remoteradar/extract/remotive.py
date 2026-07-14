@@ -183,14 +183,14 @@ def main() -> None:
     import sys
 
     from remoteradar.config import ConfigError, database_url, load_env
-    from remoteradar.load import insert_raw_remotive_payload
+    from remoteradar.load import insert_raw_payload
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     load_env()
     try:
         dsn = database_url()  # fail fast: validate config before calling the API
         payload = fetch_tech_jobs()
-        row_id = insert_raw_remotive_payload(payload, dsn=dsn)
+        row_id = insert_raw_payload("remotive", payload, dsn=dsn)
     except (ConfigError, RemotiveError) as exc:
         sys.exit(f"Error: {exc}")
     summary = (
