@@ -30,6 +30,11 @@ models:
       # Intermediate stays as views too: int_jobs_normalized is a single
       # union over the staging views and is only read by the marts.
       +materialized: view
+    marts:
+      # Marts are tables: they are the dashboard-facing layer and aggregate
+      # over exploded JSONB arrays, so paying the build cost once per
+      # `dbt run` keeps dashboard reads cheap.
+      +materialized: table
 
 seeds:
   remoteradar:

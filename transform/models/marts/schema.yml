@@ -1,0 +1,153 @@
+version: 2
+
+models:
+  - name: mart_skills
+    description: >
+      One row per job per skill, extracted from int_jobs_normalized. Tags
+      (RemoteOK, Remotive) are exploded from the JSONB array; category
+      labels (Remotive, Adzuna) contribute one row each. Values are
+      lowercased/trimmed and deduplicated per job. Known limitation: Adzuna
+      has no free-form tags, so its jobs only appear with their single broad
+      category (e.g. "it jobs") — skill-level charts should usually filter
+      skill_type = 'tag'.
+    columns:
+      - name: job_key
+        description: Job this skill row belongs to (int_jobs_normalized.job_key).
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_jobs_normalized')
+                field: job_key
+      - name: source
+        description: Source API of the job (remotive, remoteok or adzuna).
+        tests:
+          - not_null
+      - name: skill
+        description: Lowercased, trimmed skill tag or category label.
+        tests:
+          - not_null
+      - name: skill_type
+        description: >
+          'tag' when the value came from a free-form tag array, 'category'
+          when it came from the source's single category label.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["tag", "category"]
+      - name: published_at
+        description: Publication timestamp of the job, carried over for time-series joins.
+
+  - name: mart_salary_ranges
+    description: >
+      USD salary statistics over jobs with structured salary data, at three
+      grain levels labelled by grouping_level ('source',
+      'source_salary_source', 'source_category'). Pick ONE level when
+      querying — the levels overlap by design so the dashboard never has to
+      re-aggregate averages. Statistics use the midpoint of each job's
+      posted range (falling back to the single bound when only one exists).
+      Jobs with salary_source 'text_only' or 'missing' are excluded. Numbers
+      at level 'source_salary_source' with salary_source =
+      'structured_converted' rely on the fixed exchange_rates seed and are
+      approximate.
+    columns:
+      - name: grouping_level
+        description: Which grain this row belongs to; filter on it before charting.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["source", "source_salary_source", "source_category"]
+      - name: source
+        description: Source API (present at every grain).
+        tests:
+          - not_null
+      - name: salary_source
+        description: >
+          Salary confidence label ('structured_usd' or
+          'structured_converted'); only populated at grain
+          'source_salary_source'.
+      - name: category
+        description: Category label; only populated at grain 'source_category'.
+      - name: job_count
+        description: Number of salaried jobs in the group.
+        tests:
+          - not_null
+      - name: avg_salary_usd
+        description: Average of the jobs' salary midpoints, in USD, rounded to whole dollars.
+      - name: median_salary_usd
+        description: Median (percentile_cont 0.5) of the jobs' salary midpoints, in USD, rounded.
+      - name: min_salary_usd
+        description: Lowest salary_min_usd in the group.
+        tests:
+          - min_not_greater_than_max:
+              arguments:
+                max_column: max_salary_usd
+      - name: max_salary_usd
+        description: Highest salary_max_usd in the group.
+
+  - name: mart_companies
+    description: >
+      Job counts per company across the three sources, for the "companies
+      hiring remote the most" chart. Companies are grouped by
+      lowercased/trimmed name only. Known limitation: no fuzzy matching —
+      the same employer spelled differently across sources counts as
+      separate rows.
+    columns:
+      - name: company_key
+        description: Grouping key — company name lowercased and trimmed.
+        tests:
+          - not_null
+          - unique
+      - name: company
+        description: >
+          Display name: the alphabetically last spelling observed for this
+          company_key (stable, but arbitrary among case variants).
+        tests:
+          - not_null
+      - name: job_count
+        description: Number of distinct job postings attributed to the company.
+        tests:
+          - not_null
+      - name: source_count
+        description: How many distinct sources the company appears in (1 to 3).
+      - name: sources
+        description: Comma-separated sorted list of the sources the company appears in.
+      - name: first_published_at
+        description: Oldest publication timestamp among the company's jobs.
+      - name: last_published_at
+        description: Newest publication timestamp among the company's jobs.
+
+  - name: mart_jobs_over_time
+    description: >
+      Weekly job counts by source, and by source and skill, labelled by
+      grouping_level ('source', 'source_skill') — pick ONE level when
+      querying. Weeks bucket published_at (job publication on the source
+      site), chosen over ingested_at because it carries real history even
+      while the pipeline has few runs; see the model SQL for the rationale.
+      Known limitation: until the pipeline runs on a schedule (Phase 7),
+      history is shallow — the structure matters more than the volume for
+      now.
+    columns:
+      - name: grouping_level
+        description: Which grain this row belongs to; filter on it before charting.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["source", "source_skill"]
+      - name: week_start
+        description: Monday of the ISO week the jobs were published in (date_trunc('week', published_at)).
+        tests:
+          - not_null
+      - name: source
+        description: Source API (present at every grain).
+        tests:
+          - not_null
+      - name: skill
+        description: Skill from mart_skills; only populated at grain 'source_skill'.
+      - name: job_count
+        description: Jobs published that week in the group (at 'source_skill', a job counts once per skill).
+        tests:
+          - not_null
