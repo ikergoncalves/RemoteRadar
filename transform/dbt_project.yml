@@ -26,3 +26,12 @@ models:
       # Staging stays as views: it is a thin JSONB-parsing layer over the raw
       # tables, and views keep it always in sync with the latest ingestions.
       +materialized: view
+
+seeds:
+  remoteradar:
+    exchange_rates:
+      +column_types:
+        country_code: varchar(2)
+        currency_code: varchar(3)
+        usd_rate: numeric
+        captured_at: date

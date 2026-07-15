@@ -1,0 +1,35 @@
+version: 2
+
+seeds:
+  - name: exchange_rates
+    description: >
+      FIXED approximate exchange rates to USD, captured manually on
+      2026-07-15 (the captured_at column records this date inside the data
+      itself, since CSV files cannot carry comments). One row per Adzuna
+      search country. These rates are a deliberate free-tier simplification:
+      the project must not call an external FX API from inside dbt, and for
+      trend/portfolio purposes a fixed snapshot is good enough. They are NOT
+      kept up to date and must NOT be used for real financial decisions.
+      Update the CSV (and captured_at) manually if fresher rates matter.
+    columns:
+      - name: country_code
+        description: >
+          Two-letter Adzuna country code (matches stg_adzuna_jobs.search_country,
+          e.g. gb, us, br). Covers every country Adzuna supports.
+        tests:
+          - not_null
+          - unique
+      - name: currency_code
+        description: ISO 4217 code of the currency Adzuna reports salaries in for that country.
+        tests:
+          - not_null
+      - name: usd_rate
+        description: >
+          USD per 1 unit of the local currency (multiply a local amount by
+          this to get USD). Approximate market rate on captured_at.
+        tests:
+          - not_null
+      - name: captured_at
+        description: Date the rates were manually captured; documents how stale the snapshot is.
+        tests:
+          - not_null
