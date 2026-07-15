@@ -26,6 +26,10 @@ models:
       # Staging stays as views: it is a thin JSONB-parsing layer over the raw
       # tables, and views keep it always in sync with the latest ingestions.
       +materialized: view
+    intermediate:
+      # Intermediate stays as views too: int_jobs_normalized is a single
+      # union over the staging views and is only read by the marts.
+      +materialized: view
 
 seeds:
   remoteradar:

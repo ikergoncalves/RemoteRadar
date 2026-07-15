@@ -1,0 +1,96 @@
+version: 2
+
+models:
+  - name: int_jobs_normalized
+    description: >
+      One row per job posting across all three sources (union of the staging
+      models), with salaries normalized to USD. RemoteOK values pass through
+      (already USD); Adzuna values are converted from the search country's
+      currency using the fixed approximate rates in the exchange_rates seed;
+      Remotive has no structured values, so only salary_text is populated.
+      The salary_source column labels the confidence of the USD columns so
+      downstream marts and the dashboard can filter or warn.
+    columns:
+      - name: job_key
+        description: >
+          Cross-source primary key, source || ':' || job_id — job_id alone is
+          only unique within a source.
+        tests:
+          - not_null
+          - unique
+      - name: job_id
+        description: Source-native job id, unique only within a source.
+        tests:
+          - not_null
+      - name: source
+        description: Which API the job came from (remotive, remoteok or adzuna).
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["remotive", "remoteok", "adzuna"]
+      - name: title
+        description: Job title as published by the source.
+        tests:
+          - not_null
+      - name: company
+        description: Company name as published by the source (not reconciled across sources).
+      - name: category
+        description: Single category label (Remotive and Adzuna; null for RemoteOK).
+      - name: tags
+        description: JSONB array of free-form skill tags (Remotive and RemoteOK; null for Adzuna).
+      - name: location
+        description: Free-text location or required candidate region, source-specific format.
+      - name: salary_min
+        description: >
+          Lower salary bound in the ORIGINAL currency (salary_currency), kept
+          for traceability. Null for Remotive.
+        tests:
+          - min_not_greater_than_max:
+              arguments:
+                max_column: salary_max
+      - name: salary_max
+        description: Upper salary bound in the ORIGINAL currency (salary_currency). Null for Remotive.
+      - name: salary_currency
+        description: >
+          ISO 4217 currency of salary_min/salary_max: 'USD' for RemoteOK, the
+          search country's currency for Adzuna (from the exchange_rates
+          seed), null when there is no structured salary.
+      - name: salary_min_usd
+        description: >
+          Lower salary bound converted to USD. Equal to salary_min for
+          RemoteOK; salary_min * usd_rate (fixed seed rate, rounded to whole
+          dollars) for Adzuna; null for Remotive.
+        tests:
+          - min_not_greater_than_max:
+              arguments:
+                max_column: salary_max_usd
+      - name: salary_max_usd
+        description: Upper salary bound converted to USD (same rules as salary_min_usd).
+      - name: salary_text
+        description: >
+          Free-text salary description (Remotive only), kept verbatim for
+          future parsing — not interpreted in this phase.
+      - name: salary_source
+        description: >
+          Confidence label for the USD salary columns: 'structured_usd' =
+          numeric and already USD; 'structured_converted' = numeric,
+          converted with a fixed approximate rate; 'text_only' = only
+          salary_text available; 'missing' = no salary data (also used for
+          the theoretical case of an Adzuna country missing from the seed,
+          where conversion is impossible).
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["structured_usd", "structured_converted", "text_only", "missing"]
+      - name: salary_is_predicted
+        description: >
+          True when Adzuna's model estimated the salary rather than the ad
+          stating it; null for the other sources.
+      - name: published_at
+        description: When the job was published on the source site.
+      - name: url
+        description: Job posting URL on the source site.
+      - name: ingested_at
+        description: When the pipeline ingested the payload this job was parsed from.
