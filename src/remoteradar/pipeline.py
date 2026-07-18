@@ -1,7 +1,11 @@
 """Orchestration of all source extractions into the raw warehouse schema.
 
-This is the entry point Prefect (Phase 5) and GitHub Actions (Phase 7) will
-call; until then it runs standalone via ``python -m remoteradar.pipeline``.
+Runs standalone via ``python -m remoteradar.pipeline`` (useful for debugging a
+run without Prefect). The Prefect flow (:mod:`remoteradar.orchestration.flow`)
+does not call :func:`run_pipeline` directly: it wraps :func:`run_source` — the
+single-source unit of work factored out below — in one task per source, so
+retries and partial-failure handling live in the orchestrator while the
+extract-and-load logic stays here, shared by both entry points.
 """
 
 from __future__ import annotations
@@ -26,6 +30,37 @@ SOURCES: dict[str, Callable[[], dict[str, Any]]] = {
 
 class PipelineError(Exception):
     """Raised when every source in the pipeline fails."""
+
+
+def run_source(
+    name: str,
+    extract: Callable[[], dict[str, Any]],
+    *,
+    dsn: str | None = None,
+    loader: Callable[..., int] = insert_raw_payload,
+) -> dict[str, Any]:
+    """Extract one source and load its payload into the raw schema.
+
+    This is the single-source unit of work shared by :func:`run_pipeline`
+    (which loops over all sources tolerating failures) and the Prefect flow
+    (which wraps it in one task per source). Unlike :func:`run_pipeline`, it
+    lets any extraction or load error propagate — the caller decides how to
+    handle it (record and continue, or let Prefect retry).
+
+    Args:
+        name: source name; must be known to :func:`remoteradar.load.insert_raw_payload`.
+        extract: zero-arg extractor returning the source's consolidated payload.
+        dsn: PostgreSQL connection string; defaults to the DATABASE_URL
+            environment variable.
+        loader: callable ``(source, payload, *, dsn) -> row id`` storing one
+            payload (injectable for tests).
+
+    Returns:
+        ``{"row-id": <raw table row id>, "job-count": <declared job count>}``.
+    """
+    payload = extract()
+    row_id = loader(name, payload, dsn=dsn)
+    return {"row-id": row_id, "job-count": payload.get("job-count")}
 
 
 def run_pipeline(
@@ -67,15 +102,15 @@ def run_pipeline(
         # Broad catch by design: one misbehaving source (API change, bad
         # credentials, DB hiccup mid-run) must never take down the others.
         try:
-            payload = extract()
-            row_id = loader(name, payload, dsn=dsn)
+            info = run_source(name, extract, dsn=dsn, loader=loader)
         except Exception as exc:
             logger.exception("Source %r failed, continuing with the rest", name)
             failed[name] = str(exc)
             continue
-        job_count = payload.get("job-count")
-        succeeded[name] = {"row-id": row_id, "job-count": job_count}
-        logger.info("Source %r stored (row id %s, %s jobs)", name, row_id, job_count)
+        succeeded[name] = info
+        logger.info(
+            "Source %r stored (row id %s, %s jobs)", name, info["row-id"], info["job-count"]
+        )
 
     if sources and not succeeded:
         raise PipelineError(

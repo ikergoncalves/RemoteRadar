@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from remoteradar.load import RAW_TABLES
-from remoteradar.pipeline import SOURCES, PipelineError, run_pipeline
+from remoteradar.pipeline import SOURCES, PipelineError, run_pipeline, run_source
 
 PAYLOAD_A = {"job-count": 2, "jobs": [{"id": 1}, {"id": 2}]}
 PAYLOAD_B = {"job-count": 1, "jobs": [{"id": 3}]}
@@ -29,6 +29,24 @@ class FakeLoader:
 
 def failing_extractor() -> dict[str, Any]:
     raise RuntimeError("source API is down")
+
+
+def test_run_source_extracts_and_loads_one_source() -> None:
+    loader = FakeLoader()
+
+    info = run_source("remotive", lambda: PAYLOAD_A, dsn="postgresql://test", loader=loader)
+
+    assert info == {"row-id": 1, "job-count": 2}
+    assert loader.calls == [("remotive", PAYLOAD_A, "postgresql://test")]
+
+
+def test_run_source_propagates_failures_to_the_caller() -> None:
+    loader = FakeLoader()
+
+    with pytest.raises(RuntimeError, match="source API is down"):
+        run_source("remotive", failing_extractor, loader=loader)
+
+    assert loader.calls == []
 
 
 def test_run_pipeline_loads_every_source() -> None:
