@@ -2,9 +2,10 @@
 
 Given a configured DATABASE_URL, runs every check in
 :data:`remoteradar.quality.WAREHOUSE_CHECKS` against the warehouse and prints
-a per-check pass/fail report. This is the entry point the orchestrator
-(Prefect, Phase 5) and CI (GitHub Actions, Phase 7) will call after the
-pipeline + dbt run; until then it runs standalone::
+a per-check pass/fail report. The Prefect flow
+(:mod:`remoteradar.orchestration.flow`) calls :func:`run_checks` as its
+quality gate after the pipeline + dbt run; CI (GitHub Actions, Phase 7) will
+too. It also runs standalone::
 
     python -m remoteradar.validate   # or simply: remoteradar-validate
 
