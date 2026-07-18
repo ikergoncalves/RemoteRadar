@@ -5,19 +5,20 @@ cleans and transforms the data, loads it into a PostgreSQL data warehouse and
 powers a Streamlit trends dashboard: most requested languages, salary ranges,
 companies hiring remote the most, and evolution over time.
 
-> **Phased project.** This is Phase 6 of 7: three extraction sources
-> (Remotive, RemoteOK, Adzuna) landing raw JSONB payloads in PostgreSQL, a
-> pipeline CLI that orchestrates them with partial-failure tolerance, a
-> dbt project with staging models plus an analytics layer — currency-
-> normalized jobs, skills, salary ranges, top remote companies and postings
-> over time — a data quality layer with Great Expectations validating
-> every warehouse layer, testable locally without a database, a Prefect
-> flow orchestrating the whole run (extract + load, dbt, validation) with a
-> daily schedule ready for Prefect Cloud, and a Streamlit dashboard over the
-> dbt marts with a built-in demo mode, ready for Streamlit Community Cloud.
-> CI arrives in the next phase.
+> **Phased project.** This is Phase 7 of 7 — the pipeline is complete: three
+> extraction sources (Remotive, RemoteOK, Adzuna) landing raw JSONB payloads
+> in PostgreSQL, a pipeline CLI that orchestrates them with partial-failure
+> tolerance, a dbt project with staging models plus an analytics layer —
+> currency-normalized jobs, skills, salary ranges, top remote companies and
+> postings over time — a data quality layer with Great Expectations
+> validating every warehouse layer, testable locally without a database, a
+> Prefect flow orchestrating the whole run (extract + load, dbt, validation),
+> a Streamlit dashboard over the dbt marts with a built-in demo mode, ready
+> for Streamlit Community Cloud, and GitHub Actions running CI on every
+> push/PR plus the production pipeline on a daily cron (observable in Prefect
+> Cloud). See [CI/CD (GitHub Actions)](#cicd-github-actions).
 
-## Planned stack
+## Stack
 
 | Layer               | Tool                                            |
 | ------------------- | ----------------------------------------------- |
@@ -34,13 +35,16 @@ companies hiring remote the most, and evolution over time.
 
 ```
 remoteradar/
+├── .github/workflows/
+│   ├── ci.yml               # CI: ruff + pytest + dbt parse on every push/PR to main
+│   └── daily-pipeline.yml   # Production: daily cron running the Prefect flow once
 ├── src/remoteradar/
 │   ├── config.py            # Environment variable handling (.env)
 │   ├── load.py              # Raw payload loading into PostgreSQL
 │   ├── pipeline.py          # CLI orchestrating all extractions (debug path)
 │   ├── validate.py          # CLI running the quality suites against the warehouse
 │   ├── orchestration/
-│   │   └── flow.py          # Prefect flow: source tasks + dbt + validation, daily schedule
+│   │   └── flow.py          # Prefect flow: source tasks + dbt + validation
 │   ├── quality/             # Great Expectations home: suites + check registry
 │   │   ├── suites.py        # Expectation suites (raw, staging, marts), documented
 │   │   └── checks.py        # Suite <-> warehouse table/query bindings
@@ -137,9 +141,10 @@ extraction + load, `dbt run` and the data quality gate in a single run:
 python -m remoteradar.orchestration.flow   # or simply: remoteradar-flow
 ```
 
-See [Orchestration (Prefect)](#orchestration-prefect) for the task
-structure, the failure semantics, the daily schedule and the Prefect Cloud
-setup steps.
+This is exactly what the daily production workflow executes on its schedule
+(see [CI/CD](#cicd-github-actions)). See
+[Orchestration (Prefect)](#orchestration-prefect) for the task structure,
+the failure semantics and the Prefect Cloud setup steps.
 
 ### Run stages individually (debug)
 
@@ -248,7 +253,8 @@ tables created; `dbt parse` validates the project without a database.
 - **Skill granularity differs per source.** Adzuna has no free-form tags,
   only a single broad category ("IT Jobs"), so skill-level charts should
   filter `skill_type = 'tag'` (RemoteOK and Remotive).
-- **Shallow history.** Until the pipeline runs on a schedule (Phase 7),
+- **Shallow history.** Until the daily scheduled runs (see
+  [CI/CD](#cicd-github-actions)) have accumulated for a while,
   `mart_jobs_over_time` only covers the weeks the sources happen to list —
   the structure matters more than the volume for now.
 
@@ -315,10 +321,10 @@ ids, future timestamps, job-count mismatches, `min > max`, unknown
 `grouping_level`…) must fail exactly the expectation that guards it.
 
 > **Scope:** these tests validate the *logic* of the expectations, so the
-> suites are trustworthy before any database exists. They are **not** an
-> end-to-end validation of the warehouse — that requires the steps below
-> and is still pending in this project (no real PostgreSQL has been
-> provisioned yet).
+> suites are trustworthy without touching a database. They are **not** an
+> end-to-end validation of the warehouse — that is what the CLI below does
+> against the real PostgreSQL, and what the daily pipeline runs as its
+> final gate.
 
 ### Validate the real warehouse
 
@@ -341,9 +347,9 @@ ERROR   mart_companies (suite mart_companies)
 Summary: 7 passed, 1 failed, 1 error(s)
 ```
 
-The exit code is 0 only when every check passes, so orchestration (Prefect,
-Phase 5) and CI (GitHub Actions, Phase 7) can call it as a gate after the
-pipeline + dbt run. Notes:
+The exit code is 0 only when every check passes, so the Prefect flow (and
+through it the daily GitHub Actions run) uses the same logic as a gate after
+the pipeline + dbt run. Notes:
 
 - Checks are independent: a missing table (e.g. marts not built yet) is
   reported as `ERROR` and the remaining checks still run.
@@ -386,20 +392,25 @@ Design notes (also documented in the module docstring):
   loads `.env` at start — which also means the `DBT_PG_*` values in `.env`
   reach the dbt subprocess, no manual exporting needed (unlike running dbt
   by hand).
-- **Deployment via `flow.serve()` instead of `prefect.yaml`.** Serving needs
-  no work pool or separate worker: one long-lived process hosts the daily
-  schedule (cron `0 6 * * *`, `America/Sao_Paulo`) and executes the runs —
-  the right size for a free-tier, single-machine setup. A worker-based
-  `prefect.yaml` only pays off with remote infrastructure; Phase 7 (GitHub
-  Actions) may revisit that.
+- **Production scheduling lives in GitHub Actions, not in a Prefect
+  process.** The [daily workflow](#cicd-github-actions) runs
+  `remoteradar-flow` once per day with `PREFECT_API_URL`/`PREFECT_API_KEY`
+  set, so every run still shows up in Prefect Cloud (logs, task retries,
+  duration) without any machine staying on between runs. `flow.serve()`
+  remains available as a **local/manual alternative** (see below): one
+  long-lived process hosting the same daily cron (`0 6 * * *`,
+  `America/Sao_Paulo`) — useful if you would rather schedule from a machine
+  you keep running than from GitHub. A worker-based `prefect.yaml` setup
+  was considered and rejected: it only pays off with remote infrastructure
+  that this free-tier project does not have.
 
-### Activating it with Prefect Cloud
+### Running it locally with Prefect Cloud
 
 > These steps require real credentials: a Prefect Cloud account (free tier)
 > and a reachable PostgreSQL with the raw tables created and the dbt seed
-> loaded. Without them the flow *starts* but fails in the extraction/load,
-> dbt or validation tasks — expected at this point of the project, where no
-> real warehouse has been provisioned yet.
+> loaded. This is the *manual/local* path — production runs are scheduled by
+> [GitHub Actions](#cicd-github-actions), which authenticates with env vars
+> instead of `prefect cloud login`.
 
 ```bash
 # 1. Authenticate this machine against your Prefect Cloud workspace
@@ -411,9 +422,11 @@ psql "$DATABASE_URL" -f sql/001_create_raw_remotive_jobs.sql   # ...002, 003
 cd transform && dbt seed && cd ..
 
 # 3. Run the flow once, manually — it appears as a flow run in the Cloud UI
+#    (exactly what the daily GitHub Actions workflow does on its schedule)
 python -m remoteradar.orchestration.flow    # or: remoteradar-flow
 
-# 4. Serve the scheduled deployment (blocks; keep the process running)
+# 4. Optional local alternative to the GitHub Actions schedule: serve the
+#    deployment (blocks; keep the process running)
 remoteradar-flow --serve
 ```
 
@@ -422,7 +435,9 @@ with the daily cron schedule and keeps executing scheduled (and UI-triggered)
 runs until the process is stopped — from the Cloud UI you can then trigger
 runs, pause the schedule, or re-run a subset of sources via the flow's
 `sources` parameter. Run it from the repository root: the dbt project
-directory and the `.env` file are resolved from the checkout.
+directory and the `.env` file are resolved from the checkout. **It is not
+the production path**: keeping it running while the GitHub Actions cron is
+active would execute the pipeline twice a day.
 
 ## Dashboard (Streamlit)
 
@@ -517,6 +532,65 @@ Job data comes from [Remote OK](https://remoteok.com),
 dashboard footer links back to all three; the Remote OK link-back and
 mention are **required** by its API terms (the API response itself carries
 the legal notice), so keep that attribution visible in any fork or deploy.
+
+## CI/CD (GitHub Actions)
+
+Two workflows live in [`.github/workflows/`](.github/workflows/). The
+division of labour: **GitHub Actions schedules and executes** the production
+pipeline; **Prefect Cloud observes it** (every run appears there with logs,
+task retries and duration) but schedules nothing. No machine stays on
+between runs.
+
+### `ci.yml` — lint, tests, dbt validation
+
+Runs on every push and pull request to `main`: `ruff check .`, `pytest` and
+`dbt parse --project-dir transform --profiles-dir transform`. It needs **no
+secrets** — the test suite is all mocks/fixtures (no real database, network
+or Prefect Cloud; see [Tests and lint](#tests-and-lint)) and `dbt parse`
+only validates the project syntactically, running on the env-var defaults
+baked into `transform/profiles.yml`. Python is pinned to 3.13, the version
+used for local development and the Streamlit deploy (`requires-python
+>=3.11` remains the compatibility floor).
+
+### `daily-pipeline.yml` — the production run
+
+Executes `remoteradar-flow` (the flow, once, **without** `--serve`) on a
+daily cron — `0 9 * * *` UTC, i.e. 06:00 `America/Sao_Paulo`, the same local
+time as the flow's own serve() schedule (Brazil has no DST, so the offset is
+a fixed −3). A failed flow run propagates its exception out of the entry
+point, so the job — and the workflow — fails visibly in the Actions tab.
+
+**Run it manually** (no need to wait for the cron): GitHub → **Actions** →
+**Daily pipeline** → **Run workflow** → branch `main` → **Run workflow**.
+This is the `workflow_dispatch` trigger.
+
+### Required GitHub Secrets
+
+Configure under **Settings → Secrets and variables → Actions → New
+repository secret**. The daily workflow injects all of them as environment
+variables; none has a default:
+
+| Secret | What it is |
+| ------ | ---------- |
+| `DATABASE_URL` | PostgreSQL connection string (`postgresql://user:password@host:5432/dbname`) used by extraction/load and the quality checks. |
+| `ADZUNA_APP_ID` | Application ID of your [Adzuna developer](https://developer.adzuna.com/) app. |
+| `ADZUNA_APP_KEY` | Application key of the same Adzuna app. |
+| `DBT_PG_HOST` | Warehouse host for dbt (the host part of `DATABASE_URL`). |
+| `DBT_PG_PORT` | Warehouse port for dbt (usually `5432`). |
+| `DBT_PG_USER` | Warehouse user for dbt. |
+| `DBT_PG_PASSWORD` | Warehouse password for dbt. |
+| `DBT_PG_DBNAME` | Warehouse database name for dbt. |
+| `DBT_PG_SCHEMA` | Schema where dbt materializes the models (`analytics`, unless changed). |
+| `PREFECT_API_URL` | Workspace API URL: `https://api.prefect.cloud/api/accounts/<ACCOUNT_ID>/workspaces/<WORKSPACE_ID>` — both IDs are visible in your Prefect Cloud dashboard URL. |
+| `PREFECT_API_KEY` | Prefect Cloud API key (create under **API keys** in your profile). |
+
+The `DBT_PG_*` values are the components of `DATABASE_URL` split up, because
+dbt-postgres does not accept a connection string — same convention as
+`.env.example`.
+
+**Prefect Cloud auth in CI is non-interactive**: setting `PREFECT_API_URL` +
+`PREFECT_API_KEY` as environment variables is all it takes — no
+`prefect cloud login`, which is only for interactive machines.
 
 ## Tests and lint
 

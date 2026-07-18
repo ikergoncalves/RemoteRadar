@@ -28,12 +28,15 @@ Design decisions
   every task reads the environment (via ``.env``) itself. The flow only calls
   :func:`~remoteradar.config.database_url` up front to fail fast when the
   variable is missing, discarding the value.
-- **Deployment via** ``flow.serve()`` **instead of** ``prefect.yaml``. Serving
-  needs no work pool or separate worker process — one long-lived process on
-  any machine (the free-tier scenario for this project) both hosts the daily
-  cron schedule and executes the runs. A ``prefect.yaml``/worker setup only
-  pays off with remote/dynamic infrastructure, which Phase 7 (GitHub Actions)
-  may revisit.
+- **Production scheduling is GitHub Actions, not** ``flow.serve()``. The
+  daily workflow (``.github/workflows/daily-pipeline.yml``) runs this flow
+  once per execution with ``PREFECT_API_URL``/``PREFECT_API_KEY`` set, so
+  runs appear in Prefect Cloud without any long-lived process.
+  ``serve_deployment()`` remains as a local/manual alternative — one
+  process hosting the same daily cron — but keeping it running alongside
+  the Actions cron would execute the pipeline twice a day. A
+  ``prefect.yaml``/worker setup was rejected: it only pays off with
+  remote/dynamic infrastructure this free-tier project does not have.
 """
 
 from __future__ import annotations
