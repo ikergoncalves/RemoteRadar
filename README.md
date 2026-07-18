@@ -53,6 +53,8 @@ remoteradar/
 │   ├── data.py              # Data layer: mart loading, demo fallback, shaping (no Streamlit)
 │   ├── requirements.txt     # Community Cloud deploy manifest (dashboard-only deps)
 │   └── sample_data/         # Synthetic mart CSVs powering the demo mode
+├── scripts/
+│   └── gen_sample_data.py   # Seeded generator for dashboard/sample_data/ (see dashboard section)
 ├── sql/                     # Landing table DDL (one file per source)
 ├── transform/               # dbt project (staging + analytics layers)
 │   ├── dbt_project.yml
@@ -464,7 +466,11 @@ reason — so a portfolio visitor can explore every chart without a database,
 and can never mistake sample numbers for real ones. The sample CSVs were
 generated from one coherent synthetic jobs table (counts add up across
 grouping levels) and mirror the real mart schemas exactly; they are not the
-test fixtures, which contain deliberate corruptions.
+test fixtures, which contain deliberate corruptions. They come from
+`scripts/gen_sample_data.py`, which uses a fixed seed: rerunning
+`python scripts/gen_sample_data.py` from the repository root reproduces the
+committed CSVs byte-for-byte, and tweaking its pools, sizes or distributions
+then rerunning it is the supported way to reshape the demo data.
 
 ### Deploying to Streamlit Community Cloud
 
