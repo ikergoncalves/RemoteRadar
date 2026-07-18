@@ -18,11 +18,13 @@ dependencies = [
     # GX does not ship SQLAlchemy by default; needed by its postgres
     # datasource (used with the psycopg v3 driver above, not psycopg2).
     "sqlalchemy>=2.0",
+    "prefect>=3.7,<4",
 ]
 
 [project.scripts]
 remoteradar = "remoteradar.pipeline:main"
 remoteradar-validate = "remoteradar.validate:main"
+remoteradar-flow = "remoteradar.orchestration.flow:main"
 
 [project.optional-dependencies]
 dev = [
