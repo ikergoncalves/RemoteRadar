@@ -1,0 +1,64 @@
+company_key,company,job_count,source_count,sources,first_published_at,last_published_at
+hashicorp,HashiCorp,32,1,remoteok,2026-06-21T19:27:32+00:00,2026-07-16T04:10:59+00:00
+clevertech,Clevertech,29,1,remotive,2026-04-30T12:46:25+00:00,2026-07-17T02:12:41+00:00
+zapier,Zapier,27,3,"adzuna, remoteok, remotive",2026-05-16T04:04:38+00:00,2026-07-17T05:31:18+00:00
+automattic,Automattic,26,3,"adzuna, remoteok, remotive",2026-06-15T14:27:02+00:00,2026-07-16T15:21:06+00:00
+doist,Doist,20,3,"adzuna, remoteok, remotive",2026-06-01T12:09:30+00:00,2026-07-14T15:49:26+00:00
+aiven,Aiven,16,1,remotive,2026-05-06T06:10:23+00:00,2026-07-06T04:31:54+00:00
+gitlab,GitLab,16,3,"adzuna, remoteok, remotive",2026-06-01T15:44:49+00:00,2026-07-16T09:54:06+00:00
+remote,Remote,12,2,"remoteok, remotive",2026-05-02T03:14:14+00:00,2026-07-12T13:34:36+00:00
+chainlink labs,Chainlink Labs,11,1,remoteok,2026-06-23T06:50:11+00:00,2026-07-16T09:34:14+00:00
+podia,Podia,10,1,remotive,2026-05-16T15:09:37+00:00,2026-07-11T19:40:53+00:00
+and digital,AND Digital,9,1,adzuna,2026-06-17T13:46:15+00:00,2026-07-09T23:45:27+00:00
+duckduckgo,DuckDuckGo,9,1,remotive,2026-06-08T11:25:12+00:00,2026-07-08T08:51:43+00:00
+10up,10up,7,1,remotive,2026-06-03T13:58:54+00:00,2026-07-11T13:51:54+00:00
+deel,Deel,7,1,remotive,2026-05-08T22:44:34+00:00,2026-07-14T16:17:51+00:00
+starling bank,Starling Bank,7,1,adzuna,2026-06-13T00:18:42+00:00,2026-07-12T09:54:03+00:00
+buffer,Buffer,6,2,"remoteok, remotive",2026-05-16T11:41:05+00:00,2026-07-13T00:37:55+00:00
+shopify,Shopify,6,1,remoteok,2026-06-16T02:38:08+00:00,2026-07-01T16:06:43+00:00
+sky,Sky,6,1,adzuna,2026-06-19T18:17:08+00:00,2026-07-08T04:53:08+00:00
+capgemini,Capgemini,5,1,adzuna,2026-06-16T00:25:39+00:00,2026-07-10T06:04:04+00:00
+sourcegraph,Sourcegraph,5,1,remoteok,2026-06-21T14:51:24+00:00,2026-07-16T05:47:16+00:00
+zellis,Zellis,5,1,adzuna,2026-06-18T20:09:40+00:00,2026-06-30T08:15:00+00:00
+canonical,Canonical,4,2,"remoteok, remotive",2026-05-07T11:43:50+00:00,2026-07-07T17:52:49+00:00
+close,Close,4,1,remotive,2026-05-10T19:08:50+00:00,2026-06-19T11:15:24+00:00
+coinbase,Coinbase,4,1,remoteok,2026-06-22T08:07:27+00:00,2026-07-14T08:56:51+00:00
+help scout,Help Scout,4,1,remotive,2026-06-20T17:01:31+00:00,2026-07-12T01:33:37+00:00
+knack,Knack,4,1,remotive,2026-05-14T01:58:58+00:00,2026-06-21T17:20:59+00:00
+komoot,Komoot,4,1,remotive,2026-05-18T15:28:39+00:00,2026-07-15T23:44:44+00:00
+wikimedia foundation,Wikimedia Foundation,4,1,remotive,2026-06-09T00:44:15+00:00,2026-07-01T17:57:07+00:00
+elastic,Elastic,3,1,remotive,2026-06-06T07:46:42+00:00,2026-06-27T03:09:14+00:00
+endava,Endava,3,1,adzuna,2026-06-29T13:05:50+00:00,2026-07-16T17:53:37+00:00
+float,Float,3,1,remotive,2026-06-16T17:11:37+00:00,2026-07-10T20:17:13+00:00
+kainos,Kainos,3,1,adzuna,2026-06-21T09:35:04+00:00,2026-07-05T06:50:43+00:00
+lloyds banking group,Lloyds Banking Group,3,1,adzuna,2026-06-27T14:55:08+00:00,2026-07-05T02:24:15+00:00
+mozilla,Mozilla,3,1,remotive,2026-05-11T22:11:04+00:00,2026-07-08T00:00:02+00:00
+render,Render,3,1,remoteok,2026-07-06T15:07:20+00:00,2026-07-15T02:31:32+00:00
+safetywing,SafetyWing,3,1,remotive,2026-05-30T00:00:56+00:00,2026-07-06T12:22:35+00:00
+supabase,Supabase,3,1,remoteok,2026-06-16T05:55:55+00:00,2026-06-28T23:29:38+00:00
+timescale,Timescale,3,1,remotive,2026-05-16T06:36:42+00:00,2026-06-21T05:35:54+00:00
+toggl,Toggl,3,2,"remoteok, remotive",2026-05-14T23:42:13+00:00,2026-07-12T12:54:23+00:00
+x-team,X-Team,3,1,remotive,2026-05-30T17:50:11+00:00,2026-07-06T14:02:23+00:00
+basecamp,Basecamp,2,1,remoteok,2026-06-18T07:36:02+00:00,2026-06-25T14:10:45+00:00
+bitovi,Bitovi,2,1,remotive,2026-05-31T07:04:42+00:00,2026-06-25T10:33:44+00:00
+docker,Docker,2,1,remoteok,2026-07-08T21:46:07+00:00,2026-07-16T03:16:38+00:00
+ghost,Ghost,2,1,remoteok,2026-06-24T10:58:50+00:00,2026-07-11T23:33:55+00:00
+grafana labs,Grafana Labs,2,1,remotive,2026-06-08T11:54:53+00:00,2026-06-18T22:54:08+00:00
+kinsta,Kinsta,2,1,remotive,2026-05-06T01:24:33+00:00,2026-07-14T09:27:51+00:00
+netguru,Netguru,2,1,remotive,2026-05-22T06:28:32+00:00,2026-06-28T11:16:35+00:00
+posthog,PostHog,2,1,remoteok,2026-07-03T14:07:11+00:00,2026-07-17T03:06:31+00:00
+registers of scotland,Registers of Scotland,2,1,adzuna,2026-07-01T15:53:23+00:00,2026-07-09T18:21:06+00:00
+sainsbury's tech,Sainsbury's Tech,2,1,adzuna,2026-06-15T15:31:48+00:00,2026-06-23T11:02:41+00:00
+softcat,Softcat,2,1,adzuna,2026-07-07T06:06:41+00:00,2026-07-09T05:31:07+00:00
+tailscale,Tailscale,2,1,remoteok,2026-06-28T13:18:56+00:00,2026-07-07T19:16:15+00:00
+accenture,Accenture,1,1,adzuna,2026-07-10T16:32:18+00:00,2026-07-10T16:32:18+00:00
+bt group,BT Group,1,1,adzuna,2026-07-08T12:07:38+00:00,2026-07-08T12:07:38+00:00
+digitalocean,DigitalOcean,1,1,remoteok,2026-07-11T21:22:29+00:00,2026-07-11T21:22:29+00:00
+fly.io,Fly.io,1,1,remoteok,2026-06-19T17:15:08+00:00,2026-06-19T17:15:08+00:00
+hotjar,Hotjar,1,1,remotive,2026-07-06T19:04:42+00:00,2026-07-06T19:04:42+00:00
+kraken,Kraken,1,1,remoteok,2026-06-25T20:49:02+00:00,2026-06-25T20:49:02+00:00
+netlify,Netlify,1,1,remoteok,2026-07-01T21:37:21+00:00,2026-07-01T21:37:21+00:00
+nhs digital,NHS Digital,1,1,adzuna,2026-06-26T21:55:33+00:00,2026-06-26T21:55:33+00:00
+sketchdeck,SketchDeck,1,1,remotive,2026-06-17T03:11:42+00:00,2026-06-17T03:11:42+00:00
+the very group,The Very Group,1,1,adzuna,2026-06-24T22:26:02+00:00,2026-06-24T22:26:02+00:00
+vercel,Vercel,1,1,remoteok,2026-07-02T05:18:18+00:00,2026-07-02T05:18:18+00:00

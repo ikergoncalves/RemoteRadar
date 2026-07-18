@@ -1,0 +1,570 @@
+grouping_level,week_start,source,skill,job_count
+source,2026-04-27,remotive,,2
+source,2026-05-04,remotive,,6
+source,2026-05-11,remotive,,9
+source,2026-05-18,remotive,,10
+source,2026-05-25,remotive,,8
+source,2026-06-01,remotive,,16
+source,2026-06-08,adzuna,,2
+source,2026-06-08,remotive,,12
+source,2026-06-15,adzuna,,14
+source,2026-06-15,remoteok,,8
+source,2026-06-15,remotive,,34
+source,2026-06-22,adzuna,,18
+source,2026-06-22,remoteok,,27
+source,2026-06-22,remotive,,16
+source,2026-06-29,adzuna,,20
+source,2026-06-29,remoteok,,35
+source,2026-06-29,remotive,,17
+source,2026-07-06,adzuna,,28
+source,2026-07-06,remoteok,,28
+source,2026-07-06,remotive,,20
+source,2026-07-13,adzuna,,8
+source,2026-07-13,remoteok,,22
+source,2026-07-13,remotive,,10
+source_skill,2026-04-27,remotive,docker,1
+source_skill,2026-04-27,remotive,linux,1
+source_skill,2026-04-27,remotive,machine learning,1
+source_skill,2026-04-27,remotive,ruby,1
+source_skill,2026-04-27,remotive,sales / business,1
+source_skill,2026-04-27,remotive,senior,1
+source_skill,2026-04-27,remotive,software development,1
+source_skill,2026-04-27,remotive,sql,2
+source_skill,2026-04-27,remotive,vue,1
+source_skill,2026-05-04,remotive,api,1
+source_skill,2026-05-04,remotive,aws,2
+source_skill,2026-05-04,remotive,backend,3
+source_skill,2026-05-04,remotive,cloud,1
+source_skill,2026-05-04,remotive,design,1
+source_skill,2026-05-04,remotive,devops,1
+source_skill,2026-05-04,remotive,django,1
+source_skill,2026-05-04,remotive,docker,1
+source_skill,2026-05-04,remotive,java,1
+source_skill,2026-05-04,remotive,javascript,1
+source_skill,2026-05-04,remotive,linux,1
+source_skill,2026-05-04,remotive,postgresql,1
+source_skill,2026-05-04,remotive,python,1
+source_skill,2026-05-04,remotive,qa,1
+source_skill,2026-05-04,remotive,react,1
+source_skill,2026-05-04,remotive,rust,1
+source_skill,2026-05-04,remotive,sales / business,1
+source_skill,2026-05-04,remotive,senior,3
+source_skill,2026-05-04,remotive,software development,3
+source_skill,2026-05-04,remotive,typescript,1
+source_skill,2026-05-11,remotive,android,1
+source_skill,2026-05-11,remotive,aws,4
+source_skill,2026-05-11,remotive,azure,1
+source_skill,2026-05-11,remotive,backend,1
+source_skill,2026-05-11,remotive,data engineering,2
+source_skill,2026-05-11,remotive,devops,1
+source_skill,2026-05-11,remotive,devops / sysadmin,1
+source_skill,2026-05-11,remotive,django,1
+source_skill,2026-05-11,remotive,docker,1
+source_skill,2026-05-11,remotive,frontend,1
+source_skill,2026-05-11,remotive,go,3
+source_skill,2026-05-11,remotive,graphql,1
+source_skill,2026-05-11,remotive,java,1
+source_skill,2026-05-11,remotive,kubernetes,2
+source_skill,2026-05-11,remotive,lead,1
+source_skill,2026-05-11,remotive,machine learning,1
+source_skill,2026-05-11,remotive,mobile,1
+source_skill,2026-05-11,remotive,node.js,1
+source_skill,2026-05-11,remotive,php,1
+source_skill,2026-05-11,remotive,postgresql,4
+source_skill,2026-05-11,remotive,product,1
+source_skill,2026-05-11,remotive,python,2
+source_skill,2026-05-11,remotive,react,5
+source_skill,2026-05-11,remotive,sales / business,1
+source_skill,2026-05-11,remotive,senior,1
+source_skill,2026-05-11,remotive,software development,6
+source_skill,2026-05-11,remotive,typescript,3
+source_skill,2026-05-11,remotive,vue,2
+source_skill,2026-05-18,remotive,aws,1
+source_skill,2026-05-18,remotive,azure,1
+source_skill,2026-05-18,remotive,backend,1
+source_skill,2026-05-18,remotive,c#,1
+source_skill,2026-05-18,remotive,cloud,1
+source_skill,2026-05-18,remotive,data,1
+source_skill,2026-05-18,remotive,data science,1
+source_skill,2026-05-18,remotive,design,1
+source_skill,2026-05-18,remotive,devops / sysadmin,3
+source_skill,2026-05-18,remotive,django,1
+source_skill,2026-05-18,remotive,docker,1
+source_skill,2026-05-18,remotive,frontend,1
+source_skill,2026-05-18,remotive,full stack,1
+source_skill,2026-05-18,remotive,git,1
+source_skill,2026-05-18,remotive,go,1
+source_skill,2026-05-18,remotive,ios,1
+source_skill,2026-05-18,remotive,java,1
+source_skill,2026-05-18,remotive,javascript,2
+source_skill,2026-05-18,remotive,kubernetes,2
+source_skill,2026-05-18,remotive,lead,1
+source_skill,2026-05-18,remotive,marketing,1
+source_skill,2026-05-18,remotive,node.js,2
+source_skill,2026-05-18,remotive,php,1
+source_skill,2026-05-18,remotive,postgresql,1
+source_skill,2026-05-18,remotive,python,3
+source_skill,2026-05-18,remotive,qa,1
+source_skill,2026-05-18,remotive,react,1
+source_skill,2026-05-18,remotive,security,1
+source_skill,2026-05-18,remotive,senior,3
+source_skill,2026-05-18,remotive,software development,3
+source_skill,2026-05-18,remotive,sql,3
+source_skill,2026-05-18,remotive,typescript,1
+source_skill,2026-05-18,remotive,vue,2
+source_skill,2026-05-25,remotive,.net,1
+source_skill,2026-05-25,remotive,api,1
+source_skill,2026-05-25,remotive,aws,3
+source_skill,2026-05-25,remotive,azure,1
+source_skill,2026-05-25,remotive,data science,1
+source_skill,2026-05-25,remotive,django,3
+source_skill,2026-05-25,remotive,docker,2
+source_skill,2026-05-25,remotive,frontend,1
+source_skill,2026-05-25,remotive,full stack,2
+source_skill,2026-05-25,remotive,graphql,2
+source_skill,2026-05-25,remotive,java,1
+source_skill,2026-05-25,remotive,javascript,4
+source_skill,2026-05-25,remotive,kubernetes,1
+source_skill,2026-05-25,remotive,lead,1
+source_skill,2026-05-25,remotive,mobile,1
+source_skill,2026-05-25,remotive,postgresql,3
+source_skill,2026-05-25,remotive,product,1
+source_skill,2026-05-25,remotive,python,1
+source_skill,2026-05-25,remotive,react,1
+source_skill,2026-05-25,remotive,security,1
+source_skill,2026-05-25,remotive,senior,1
+source_skill,2026-05-25,remotive,software development,7
+source_skill,2026-05-25,remotive,sql,2
+source_skill,2026-06-01,remotive,.net,1
+source_skill,2026-06-01,remotive,api,1
+source_skill,2026-06-01,remotive,aws,1
+source_skill,2026-06-01,remotive,azure,1
+source_skill,2026-06-01,remotive,backend,4
+source_skill,2026-06-01,remotive,c#,1
+source_skill,2026-06-01,remotive,cloud,2
+source_skill,2026-06-01,remotive,customer service,1
+source_skill,2026-06-01,remotive,data,3
+source_skill,2026-06-01,remotive,devops,1
+source_skill,2026-06-01,remotive,django,1
+source_skill,2026-06-01,remotive,docker,3
+source_skill,2026-06-01,remotive,frontend,1
+source_skill,2026-06-01,remotive,full stack,2
+source_skill,2026-06-01,remotive,gcp,1
+source_skill,2026-06-01,remotive,git,1
+source_skill,2026-06-01,remotive,go,1
+source_skill,2026-06-01,remotive,java,4
+source_skill,2026-06-01,remotive,javascript,3
+source_skill,2026-06-01,remotive,kubernetes,2
+source_skill,2026-06-01,remotive,lead,1
+source_skill,2026-06-01,remotive,node.js,1
+source_skill,2026-06-01,remotive,php,2
+source_skill,2026-06-01,remotive,postgresql,4
+source_skill,2026-06-01,remotive,product,2
+source_skill,2026-06-01,remotive,python,7
+source_skill,2026-06-01,remotive,qa,1
+source_skill,2026-06-01,remotive,react,2
+source_skill,2026-06-01,remotive,rust,1
+source_skill,2026-06-01,remotive,senior,4
+source_skill,2026-06-01,remotive,software development,9
+source_skill,2026-06-01,remotive,sql,3
+source_skill,2026-06-01,remotive,terraform,1
+source_skill,2026-06-01,remotive,typescript,5
+source_skill,2026-06-08,adzuna,it jobs,2
+source_skill,2026-06-08,remotive,android,1
+source_skill,2026-06-08,remotive,api,1
+source_skill,2026-06-08,remotive,aws,1
+source_skill,2026-06-08,remotive,azure,2
+source_skill,2026-06-08,remotive,backend,2
+source_skill,2026-06-08,remotive,cloud,2
+source_skill,2026-06-08,remotive,data science,2
+source_skill,2026-06-08,remotive,design,2
+source_skill,2026-06-08,remotive,devops,1
+source_skill,2026-06-08,remotive,django,1
+source_skill,2026-06-08,remotive,docker,2
+source_skill,2026-06-08,remotive,frontend,1
+source_skill,2026-06-08,remotive,full stack,1
+source_skill,2026-06-08,remotive,graphql,1
+source_skill,2026-06-08,remotive,java,1
+source_skill,2026-06-08,remotive,javascript,3
+source_skill,2026-06-08,remotive,kubernetes,3
+source_skill,2026-06-08,remotive,linux,1
+source_skill,2026-06-08,remotive,machine learning,1
+source_skill,2026-06-08,remotive,marketing,1
+source_skill,2026-06-08,remotive,node.js,3
+source_skill,2026-06-08,remotive,php,1
+source_skill,2026-06-08,remotive,postgresql,1
+source_skill,2026-06-08,remotive,product,2
+source_skill,2026-06-08,remotive,python,5
+source_skill,2026-06-08,remotive,qa,2
+source_skill,2026-06-08,remotive,react,1
+source_skill,2026-06-08,remotive,ruby,1
+source_skill,2026-06-08,remotive,senior,3
+source_skill,2026-06-08,remotive,software development,5
+source_skill,2026-06-08,remotive,sql,3
+source_skill,2026-06-08,remotive,typescript,2
+source_skill,2026-06-15,adzuna,it jobs,14
+source_skill,2026-06-15,remoteok,android,1
+source_skill,2026-06-15,remoteok,aws,1
+source_skill,2026-06-15,remoteok,azure,1
+source_skill,2026-06-15,remoteok,backend,2
+source_skill,2026-06-15,remoteok,cloud,1
+source_skill,2026-06-15,remoteok,data science,1
+source_skill,2026-06-15,remoteok,devops,2
+source_skill,2026-06-15,remoteok,frontend,2
+source_skill,2026-06-15,remoteok,full stack,2
+source_skill,2026-06-15,remoteok,gcp,1
+source_skill,2026-06-15,remoteok,git,1
+source_skill,2026-06-15,remoteok,java,1
+source_skill,2026-06-15,remoteok,javascript,2
+source_skill,2026-06-15,remoteok,kubernetes,1
+source_skill,2026-06-15,remoteok,mobile,1
+source_skill,2026-06-15,remoteok,node.js,2
+source_skill,2026-06-15,remoteok,php,1
+source_skill,2026-06-15,remoteok,postgresql,1
+source_skill,2026-06-15,remoteok,python,1
+source_skill,2026-06-15,remoteok,react,3
+source_skill,2026-06-15,remoteok,ruby,2
+source_skill,2026-06-15,remoteok,security,1
+source_skill,2026-06-15,remoteok,senior,1
+source_skill,2026-06-15,remoteok,terraform,2
+source_skill,2026-06-15,remoteok,typescript,1
+source_skill,2026-06-15,remotive,.net,2
+source_skill,2026-06-15,remotive,api,2
+source_skill,2026-06-15,remotive,aws,2
+source_skill,2026-06-15,remotive,azure,3
+source_skill,2026-06-15,remotive,backend,4
+source_skill,2026-06-15,remotive,c#,2
+source_skill,2026-06-15,remotive,cloud,5
+source_skill,2026-06-15,remotive,customer service,1
+source_skill,2026-06-15,remotive,data,1
+source_skill,2026-06-15,remotive,data engineering,1
+source_skill,2026-06-15,remotive,data science,5
+source_skill,2026-06-15,remotive,design,3
+source_skill,2026-06-15,remotive,devops,6
+source_skill,2026-06-15,remotive,devops / sysadmin,7
+source_skill,2026-06-15,remotive,django,1
+source_skill,2026-06-15,remotive,docker,6
+source_skill,2026-06-15,remotive,frontend,5
+source_skill,2026-06-15,remotive,full stack,2
+source_skill,2026-06-15,remotive,gcp,3
+source_skill,2026-06-15,remotive,git,1
+source_skill,2026-06-15,remotive,go,5
+source_skill,2026-06-15,remotive,graphql,3
+source_skill,2026-06-15,remotive,java,2
+source_skill,2026-06-15,remotive,javascript,14
+source_skill,2026-06-15,remotive,kubernetes,5
+source_skill,2026-06-15,remotive,lead,4
+source_skill,2026-06-15,remotive,linux,4
+source_skill,2026-06-15,remotive,node.js,9
+source_skill,2026-06-15,remotive,postgresql,3
+source_skill,2026-06-15,remotive,product,4
+source_skill,2026-06-15,remotive,python,6
+source_skill,2026-06-15,remotive,react,6
+source_skill,2026-06-15,remotive,ruby,1
+source_skill,2026-06-15,remotive,rust,2
+source_skill,2026-06-15,remotive,security,1
+source_skill,2026-06-15,remotive,senior,4
+source_skill,2026-06-15,remotive,software development,18
+source_skill,2026-06-15,remotive,sql,4
+source_skill,2026-06-15,remotive,terraform,1
+source_skill,2026-06-15,remotive,typescript,8
+source_skill,2026-06-15,remotive,vue,1
+source_skill,2026-06-22,adzuna,it jobs,18
+source_skill,2026-06-22,remoteok,.net,1
+source_skill,2026-06-22,remoteok,api,4
+source_skill,2026-06-22,remoteok,aws,4
+source_skill,2026-06-22,remoteok,azure,3
+source_skill,2026-06-22,remoteok,backend,5
+source_skill,2026-06-22,remoteok,c#,3
+source_skill,2026-06-22,remoteok,cloud,5
+source_skill,2026-06-22,remoteok,data engineering,1
+source_skill,2026-06-22,remoteok,data science,2
+source_skill,2026-06-22,remoteok,devops,2
+source_skill,2026-06-22,remoteok,django,2
+source_skill,2026-06-22,remoteok,docker,5
+source_skill,2026-06-22,remoteok,frontend,9
+source_skill,2026-06-22,remoteok,full stack,2
+source_skill,2026-06-22,remoteok,gcp,4
+source_skill,2026-06-22,remoteok,git,2
+source_skill,2026-06-22,remoteok,go,6
+source_skill,2026-06-22,remoteok,graphql,3
+source_skill,2026-06-22,remoteok,ios,1
+source_skill,2026-06-22,remoteok,java,3
+source_skill,2026-06-22,remoteok,javascript,7
+source_skill,2026-06-22,remoteok,kubernetes,4
+source_skill,2026-06-22,remoteok,lead,1
+source_skill,2026-06-22,remoteok,linux,5
+source_skill,2026-06-22,remoteok,machine learning,6
+source_skill,2026-06-22,remoteok,mobile,1
+source_skill,2026-06-22,remoteok,node.js,4
+source_skill,2026-06-22,remoteok,php,4
+source_skill,2026-06-22,remoteok,postgresql,2
+source_skill,2026-06-22,remoteok,python,5
+source_skill,2026-06-22,remoteok,react,4
+source_skill,2026-06-22,remoteok,ruby,1
+source_skill,2026-06-22,remoteok,rust,3
+source_skill,2026-06-22,remoteok,security,2
+source_skill,2026-06-22,remoteok,senior,8
+source_skill,2026-06-22,remoteok,sql,3
+source_skill,2026-06-22,remoteok,terraform,5
+source_skill,2026-06-22,remoteok,typescript,4
+source_skill,2026-06-22,remoteok,vue,2
+source_skill,2026-06-22,remotive,api,1
+source_skill,2026-06-22,remotive,aws,1
+source_skill,2026-06-22,remotive,azure,1
+source_skill,2026-06-22,remotive,backend,2
+source_skill,2026-06-22,remotive,c#,2
+source_skill,2026-06-22,remotive,cloud,2
+source_skill,2026-06-22,remotive,customer service,2
+source_skill,2026-06-22,remotive,data engineering,1
+source_skill,2026-06-22,remotive,data science,1
+source_skill,2026-06-22,remotive,devops,2
+source_skill,2026-06-22,remotive,devops / sysadmin,1
+source_skill,2026-06-22,remotive,django,2
+source_skill,2026-06-22,remotive,docker,3
+source_skill,2026-06-22,remotive,frontend,2
+source_skill,2026-06-22,remotive,full stack,2
+source_skill,2026-06-22,remotive,gcp,1
+source_skill,2026-06-22,remotive,git,1
+source_skill,2026-06-22,remotive,graphql,2
+source_skill,2026-06-22,remotive,ios,2
+source_skill,2026-06-22,remotive,java,3
+source_skill,2026-06-22,remotive,javascript,1
+source_skill,2026-06-22,remotive,kubernetes,1
+source_skill,2026-06-22,remotive,lead,1
+source_skill,2026-06-22,remotive,linux,1
+source_skill,2026-06-22,remotive,machine learning,1
+source_skill,2026-06-22,remotive,marketing,1
+source_skill,2026-06-22,remotive,node.js,6
+source_skill,2026-06-22,remotive,postgresql,1
+source_skill,2026-06-22,remotive,product,2
+source_skill,2026-06-22,remotive,python,5
+source_skill,2026-06-22,remotive,qa,1
+source_skill,2026-06-22,remotive,react,2
+source_skill,2026-06-22,remotive,ruby,2
+source_skill,2026-06-22,remotive,sales / business,1
+source_skill,2026-06-22,remotive,senior,3
+source_skill,2026-06-22,remotive,software development,8
+source_skill,2026-06-22,remotive,sql,2
+source_skill,2026-06-22,remotive,terraform,1
+source_skill,2026-06-22,remotive,typescript,3
+source_skill,2026-06-22,remotive,vue,1
+source_skill,2026-06-29,adzuna,it jobs,20
+source_skill,2026-06-29,remoteok,.net,2
+source_skill,2026-06-29,remoteok,android,2
+source_skill,2026-06-29,remoteok,api,8
+source_skill,2026-06-29,remoteok,aws,12
+source_skill,2026-06-29,remoteok,azure,4
+source_skill,2026-06-29,remoteok,backend,9
+source_skill,2026-06-29,remoteok,c#,2
+source_skill,2026-06-29,remoteok,cloud,7
+source_skill,2026-06-29,remoteok,data engineering,4
+source_skill,2026-06-29,remoteok,data science,4
+source_skill,2026-06-29,remoteok,devops,8
+source_skill,2026-06-29,remoteok,django,4
+source_skill,2026-06-29,remoteok,docker,6
+source_skill,2026-06-29,remoteok,frontend,8
+source_skill,2026-06-29,remoteok,full stack,5
+source_skill,2026-06-29,remoteok,gcp,2
+source_skill,2026-06-29,remoteok,git,5
+source_skill,2026-06-29,remoteok,go,6
+source_skill,2026-06-29,remoteok,graphql,4
+source_skill,2026-06-29,remoteok,ios,4
+source_skill,2026-06-29,remoteok,java,6
+source_skill,2026-06-29,remoteok,javascript,3
+source_skill,2026-06-29,remoteok,kubernetes,2
+source_skill,2026-06-29,remoteok,lead,3
+source_skill,2026-06-29,remoteok,linux,2
+source_skill,2026-06-29,remoteok,mobile,6
+source_skill,2026-06-29,remoteok,node.js,7
+source_skill,2026-06-29,remoteok,php,2
+source_skill,2026-06-29,remoteok,postgresql,2
+source_skill,2026-06-29,remoteok,python,13
+source_skill,2026-06-29,remoteok,react,11
+source_skill,2026-06-29,remoteok,ruby,1
+source_skill,2026-06-29,remoteok,rust,1
+source_skill,2026-06-29,remoteok,security,4
+source_skill,2026-06-29,remoteok,senior,2
+source_skill,2026-06-29,remoteok,sql,7
+source_skill,2026-06-29,remoteok,terraform,4
+source_skill,2026-06-29,remoteok,typescript,11
+source_skill,2026-06-29,remoteok,vue,4
+source_skill,2026-06-29,remotive,.net,2
+source_skill,2026-06-29,remotive,android,1
+source_skill,2026-06-29,remotive,api,1
+source_skill,2026-06-29,remotive,aws,3
+source_skill,2026-06-29,remotive,backend,1
+source_skill,2026-06-29,remotive,c#,1
+source_skill,2026-06-29,remotive,customer service,1
+source_skill,2026-06-29,remotive,data science,1
+source_skill,2026-06-29,remotive,design,1
+source_skill,2026-06-29,remotive,devops,2
+source_skill,2026-06-29,remotive,devops / sysadmin,3
+source_skill,2026-06-29,remotive,django,1
+source_skill,2026-06-29,remotive,docker,2
+source_skill,2026-06-29,remotive,frontend,3
+source_skill,2026-06-29,remotive,full stack,1
+source_skill,2026-06-29,remotive,git,2
+source_skill,2026-06-29,remotive,go,1
+source_skill,2026-06-29,remotive,graphql,1
+source_skill,2026-06-29,remotive,javascript,6
+source_skill,2026-06-29,remotive,kubernetes,5
+source_skill,2026-06-29,remotive,lead,3
+source_skill,2026-06-29,remotive,linux,2
+source_skill,2026-06-29,remotive,machine learning,2
+source_skill,2026-06-29,remotive,marketing,1
+source_skill,2026-06-29,remotive,node.js,5
+source_skill,2026-06-29,remotive,postgresql,1
+source_skill,2026-06-29,remotive,product,2
+source_skill,2026-06-29,remotive,python,4
+source_skill,2026-06-29,remotive,qa,2
+source_skill,2026-06-29,remotive,react,4
+source_skill,2026-06-29,remotive,ruby,2
+source_skill,2026-06-29,remotive,sales / business,1
+source_skill,2026-06-29,remotive,senior,2
+source_skill,2026-06-29,remotive,software development,6
+source_skill,2026-06-29,remotive,typescript,4
+source_skill,2026-07-06,adzuna,it jobs,28
+source_skill,2026-07-06,remoteok,android,3
+source_skill,2026-07-06,remoteok,api,5
+source_skill,2026-07-06,remoteok,aws,7
+source_skill,2026-07-06,remoteok,azure,4
+source_skill,2026-07-06,remoteok,backend,5
+source_skill,2026-07-06,remoteok,c#,4
+source_skill,2026-07-06,remoteok,cloud,3
+source_skill,2026-07-06,remoteok,data engineering,3
+source_skill,2026-07-06,remoteok,data science,3
+source_skill,2026-07-06,remoteok,devops,3
+source_skill,2026-07-06,remoteok,docker,8
+source_skill,2026-07-06,remoteok,frontend,4
+source_skill,2026-07-06,remoteok,full stack,9
+source_skill,2026-07-06,remoteok,gcp,4
+source_skill,2026-07-06,remoteok,git,3
+source_skill,2026-07-06,remoteok,go,2
+source_skill,2026-07-06,remoteok,graphql,4
+source_skill,2026-07-06,remoteok,ios,2
+source_skill,2026-07-06,remoteok,java,5
+source_skill,2026-07-06,remoteok,javascript,13
+source_skill,2026-07-06,remoteok,kubernetes,6
+source_skill,2026-07-06,remoteok,lead,4
+source_skill,2026-07-06,remoteok,linux,1
+source_skill,2026-07-06,remoteok,machine learning,1
+source_skill,2026-07-06,remoteok,mobile,4
+source_skill,2026-07-06,remoteok,node.js,7
+source_skill,2026-07-06,remoteok,php,3
+source_skill,2026-07-06,remoteok,postgresql,2
+source_skill,2026-07-06,remoteok,python,9
+source_skill,2026-07-06,remoteok,react,4
+source_skill,2026-07-06,remoteok,ruby,3
+source_skill,2026-07-06,remoteok,rust,3
+source_skill,2026-07-06,remoteok,security,2
+source_skill,2026-07-06,remoteok,senior,7
+source_skill,2026-07-06,remoteok,sql,5
+source_skill,2026-07-06,remoteok,typescript,5
+source_skill,2026-07-06,remoteok,vue,1
+source_skill,2026-07-06,remotive,api,2
+source_skill,2026-07-06,remotive,aws,2
+source_skill,2026-07-06,remotive,azure,2
+source_skill,2026-07-06,remotive,backend,3
+source_skill,2026-07-06,remotive,c#,2
+source_skill,2026-07-06,remotive,cloud,4
+source_skill,2026-07-06,remotive,data,3
+source_skill,2026-07-06,remotive,data engineering,2
+source_skill,2026-07-06,remotive,data science,1
+source_skill,2026-07-06,remotive,design,2
+source_skill,2026-07-06,remotive,devops,6
+source_skill,2026-07-06,remotive,devops / sysadmin,2
+source_skill,2026-07-06,remotive,django,3
+source_skill,2026-07-06,remotive,docker,1
+source_skill,2026-07-06,remotive,frontend,1
+source_skill,2026-07-06,remotive,full stack,1
+source_skill,2026-07-06,remotive,go,2
+source_skill,2026-07-06,remotive,ios,1
+source_skill,2026-07-06,remotive,java,1
+source_skill,2026-07-06,remotive,javascript,2
+source_skill,2026-07-06,remotive,kubernetes,3
+source_skill,2026-07-06,remotive,lead,1
+source_skill,2026-07-06,remotive,linux,2
+source_skill,2026-07-06,remotive,machine learning,3
+source_skill,2026-07-06,remotive,node.js,2
+source_skill,2026-07-06,remotive,php,2
+source_skill,2026-07-06,remotive,postgresql,3
+source_skill,2026-07-06,remotive,python,6
+source_skill,2026-07-06,remotive,react,5
+source_skill,2026-07-06,remotive,ruby,1
+source_skill,2026-07-06,remotive,rust,3
+source_skill,2026-07-06,remotive,sales / business,1
+source_skill,2026-07-06,remotive,security,1
+source_skill,2026-07-06,remotive,senior,6
+source_skill,2026-07-06,remotive,software development,12
+source_skill,2026-07-06,remotive,terraform,2
+source_skill,2026-07-06,remotive,typescript,3
+source_skill,2026-07-06,remotive,vue,2
+source_skill,2026-07-13,adzuna,it jobs,8
+source_skill,2026-07-13,remoteok,.net,3
+source_skill,2026-07-13,remoteok,android,2
+source_skill,2026-07-13,remoteok,api,3
+source_skill,2026-07-13,remoteok,aws,5
+source_skill,2026-07-13,remoteok,backend,6
+source_skill,2026-07-13,remoteok,c#,1
+source_skill,2026-07-13,remoteok,cloud,3
+source_skill,2026-07-13,remoteok,data engineering,2
+source_skill,2026-07-13,remoteok,data science,1
+source_skill,2026-07-13,remoteok,devops,6
+source_skill,2026-07-13,remoteok,django,6
+source_skill,2026-07-13,remoteok,docker,6
+source_skill,2026-07-13,remoteok,frontend,4
+source_skill,2026-07-13,remoteok,full stack,4
+source_skill,2026-07-13,remoteok,git,2
+source_skill,2026-07-13,remoteok,go,3
+source_skill,2026-07-13,remoteok,graphql,2
+source_skill,2026-07-13,remoteok,java,1
+source_skill,2026-07-13,remoteok,javascript,4
+source_skill,2026-07-13,remoteok,kubernetes,3
+source_skill,2026-07-13,remoteok,lead,4
+source_skill,2026-07-13,remoteok,linux,2
+source_skill,2026-07-13,remoteok,machine learning,3
+source_skill,2026-07-13,remoteok,mobile,1
+source_skill,2026-07-13,remoteok,node.js,1
+source_skill,2026-07-13,remoteok,php,1
+source_skill,2026-07-13,remoteok,postgresql,6
+source_skill,2026-07-13,remoteok,python,2
+source_skill,2026-07-13,remoteok,react,8
+source_skill,2026-07-13,remoteok,ruby,2
+source_skill,2026-07-13,remoteok,rust,2
+source_skill,2026-07-13,remoteok,senior,4
+source_skill,2026-07-13,remoteok,sql,7
+source_skill,2026-07-13,remoteok,terraform,4
+source_skill,2026-07-13,remoteok,typescript,4
+source_skill,2026-07-13,remoteok,vue,2
+source_skill,2026-07-13,remotive,.net,2
+source_skill,2026-07-13,remotive,aws,2
+source_skill,2026-07-13,remotive,azure,1
+source_skill,2026-07-13,remotive,backend,3
+source_skill,2026-07-13,remotive,c#,1
+source_skill,2026-07-13,remotive,cloud,1
+source_skill,2026-07-13,remotive,customer service,1
+source_skill,2026-07-13,remotive,data,1
+source_skill,2026-07-13,remotive,data engineering,1
+source_skill,2026-07-13,remotive,data science,1
+source_skill,2026-07-13,remotive,devops,3
+source_skill,2026-07-13,remotive,docker,2
+source_skill,2026-07-13,remotive,frontend,1
+source_skill,2026-07-13,remotive,full stack,2
+source_skill,2026-07-13,remotive,graphql,1
+source_skill,2026-07-13,remotive,java,2
+source_skill,2026-07-13,remotive,kubernetes,2
+source_skill,2026-07-13,remotive,machine learning,1
+source_skill,2026-07-13,remotive,marketing,1
+source_skill,2026-07-13,remotive,node.js,1
+source_skill,2026-07-13,remotive,php,1
+source_skill,2026-07-13,remotive,postgresql,1
+source_skill,2026-07-13,remotive,product,2
+source_skill,2026-07-13,remotive,python,1
+source_skill,2026-07-13,remotive,react,2
+source_skill,2026-07-13,remotive,ruby,1
+source_skill,2026-07-13,remotive,security,1
+source_skill,2026-07-13,remotive,senior,2
+source_skill,2026-07-13,remotive,software development,5
+source_skill,2026-07-13,remotive,terraform,2
+source_skill,2026-07-13,remotive,typescript,3

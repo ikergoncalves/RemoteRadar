@@ -1,0 +1,6 @@
+grouping_level,source,salary_source,category,job_count,avg_salary_usd,median_salary_usd,min_salary_usd,max_salary_usd
+source,adzuna,,,72,90835,90064,40958,163857
+source,remoteok,,,88,112131,118750,40000,195000
+source_salary_source,adzuna,structured_converted,,72,90835,90064,40958,163857
+source_salary_source,remoteok,structured_usd,,88,112131,118750,40000,195000
+source_category,adzuna,,IT Jobs,72,90835,90064,40958,163857
