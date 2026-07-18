@@ -1,0 +1,48 @@
+# Continuous integration: lint, tests and dbt project validation.
+#
+# Needs no secrets — the test suite runs entirely on mocks/fixtures (no real
+# database, network or Prefect Cloud), and `dbt parse` only checks the project
+# syntactically, using the env-var defaults baked into transform/profiles.yml.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          # 3.13 matches local development and the Streamlit Community Cloud
+          # deploy (the README pins both); requires-python (>=3.11) stays the
+          # compatibility floor, but CI validates the version actually used.
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install the package with dev dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Test (pytest)
+        run: pytest
+
+      - name: Validate the dbt project (dbt parse)
+        env:
+          DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
+        run: dbt parse --project-dir transform --profiles-dir transform
