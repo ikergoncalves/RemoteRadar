@@ -12,6 +12,8 @@ DEFAULT_ADZUNA_API_URL = "https://api.adzuna.com/v1/api/jobs"
 # Default country for Adzuna job searches. "gb" is Adzuna's home market and
 # has the deepest job coverage; override with ADZUNA_COUNTRY (e.g. "us").
 DEFAULT_ADZUNA_COUNTRY = "gb"
+# Schema where dbt materializes its models; must match transform/profiles.yml.
+DEFAULT_ANALYTICS_SCHEMA = "analytics"
 
 
 class ConfigError(RuntimeError):
@@ -59,6 +61,15 @@ def adzuna_credentials() -> tuple[str, str]:
             "both values."
         )
     return app_id, app_key
+
+
+def analytics_schema() -> str:
+    """Schema where dbt materializes the models (DBT_PG_SCHEMA, default ``analytics``).
+
+    Shared with transform/profiles.yml so the data quality checks read the
+    staging views and marts from wherever dbt actually built them.
+    """
+    return os.environ.get("DBT_PG_SCHEMA") or DEFAULT_ANALYTICS_SCHEMA
 
 
 def database_url() -> str:

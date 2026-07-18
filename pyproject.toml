@@ -22,6 +22,7 @@ dependencies = [
 
 [project.scripts]
 remoteradar = "remoteradar.pipeline:main"
+remoteradar-validate = "remoteradar.validate:main"
 
 [project.optional-dependencies]
 dev = [
