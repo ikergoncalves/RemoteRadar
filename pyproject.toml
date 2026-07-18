@@ -33,6 +33,13 @@ dev = [
     "dbt-core>=1.8",
     "dbt-postgres>=1.8",
 ]
+# Local dashboard runs; the Community Cloud deploy instead installs
+# dashboard/requirements.txt (see that file's header).
+dashboard = [
+    "streamlit>=1.37",
+    "pandas>=2.0",
+    "altair>=5.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -40,11 +47,17 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+# dashboard/ is a root-level package (not under src/); make it importable in tests
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
 target-version = "py311"
+
+[tool.ruff.lint.isort]
+# dashboard/ lives at the repo root (outside src/), so name it explicitly
+known-first-party = ["remoteradar", "dashboard"]
 
 [tool.ruff.lint]
 select = [
