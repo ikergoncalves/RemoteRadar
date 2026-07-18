@@ -5,21 +5,23 @@ cleans and transforms the data, loads it into a PostgreSQL data warehouse and �
 in upcoming phases — powers a trends dashboard: most requested languages,
 salary ranges, companies hiring remote the most, and evolution over time.
 
-> **Phased project.** This is Phase 4 of 7: three extraction sources
+> **Phased project.** This is Phase 5 of 7: three extraction sources
 > (Remotive, RemoteOK, Adzuna) landing raw JSONB payloads in PostgreSQL, a
 > pipeline CLI that orchestrates them with partial-failure tolerance, a
 > dbt project with staging models plus an analytics layer — currency-
 > normalized jobs, skills, salary ranges, top remote companies and postings
-> over time — and a data quality layer with Great Expectations validating
-> every warehouse layer, testable locally without a database. Orchestration
-> with Prefect and the dashboard arrive in the next phases.
+> over time — a data quality layer with Great Expectations validating
+> every warehouse layer, testable locally without a database, and a Prefect
+> flow orchestrating the whole run (extract + load, dbt, validation) with a
+> daily schedule ready for Prefect Cloud. The dashboard and CI arrive in the
+> next phases.
 
 ## Planned stack
 
 | Layer               | Tool                                            |
 | ------------------- | ----------------------------------------------- |
 | Extraction          | Python + [httpx](https://www.python-httpx.org/) |
-| Orchestration       | Prefect (open-source)                           |
+| Orchestration       | Prefect 3 (Prefect Cloud free tier)             |
 | Transformation      | dbt-core                                        |
 | Warehouse           | PostgreSQL (Supabase or Railway free tier)      |
 | Data quality        | Great Expectations                              |
@@ -34,8 +36,10 @@ remoteradar/
 ├── src/remoteradar/
 │   ├── config.py            # Environment variable handling (.env)
 │   ├── load.py              # Raw payload loading into PostgreSQL
-│   ├── pipeline.py          # CLI orchestrating all extractions
+│   ├── pipeline.py          # CLI orchestrating all extractions (debug path)
 │   ├── validate.py          # CLI running the quality suites against the warehouse
+│   ├── orchestration/
+│   │   └── flow.py          # Prefect flow: source tasks + dbt + validation, daily schedule
 │   ├── quality/             # Great Expectations home: suites + check registry
 │   │   ├── suites.py        # Expectation suites (raw, staging, marts), documented
 │   │   └── checks.py        # Suite <-> warehouse table/query bindings
@@ -115,14 +119,37 @@ psql "$DATABASE_URL" -f sql/002_create_raw_remoteok_jobs.sql
 psql "$DATABASE_URL" -f sql/003_create_raw_adzuna_jobs.sql
 ```
 
-### Run the pipeline
+### Run the full ETL (Prefect flow)
+
+The primary way to run RemoteRadar is the Prefect flow, which chains
+extraction + load, `dbt run` and the data quality gate in a single run:
 
 ```bash
-python -m remoteradar.pipeline   # or simply: remoteradar
+python -m remoteradar.orchestration.flow   # or simply: remoteradar-flow
 ```
 
-Runs the three extractions in sequence and loads each consolidated payload
-into its `raw.*` landing table. Failures are tolerated at two levels:
+See [Orchestration (Prefect)](#orchestration-prefect) for the task
+structure, the failure semantics, the daily schedule and the Prefect Cloud
+setup steps.
+
+### Run stages individually (debug)
+
+Every stage the flow orchestrates is still runnable on its own — useful to
+debug one piece without a Prefect run around it:
+
+```bash
+python -m remoteradar.pipeline           # extract + load all sources (or: remoteradar)
+python -m remoteradar.extract.remotive   # a single extraction, no load
+python -m remoteradar.extract.remoteok
+python -m remoteradar.extract.adzuna
+python -m remoteradar.validate           # quality checks (or: remoteradar-validate)
+```
+
+(dbt has its own commands — see [Transformations](#transformations-dbt).)
+
+`python -m remoteradar.pipeline` runs the three extractions in sequence and
+loads each consolidated payload into its `raw.*` landing table. Failures are
+tolerated at two levels:
 
 - **Inside a source** — a failing Remotive category, RemoteOK tag or Adzuna
   page is logged and recorded in the stored payload, and the extraction
@@ -131,14 +158,8 @@ into its `raw.*` landing table. Failures are tolerated at two levels:
   the error is logged and the pipeline continues with the remaining sources.
   The process only fails if *all* sources fail.
 
-This is the entry point Prefect (Phase 5) and GitHub Actions (Phase 7) will
-call. Each source can also be run on its own:
-
-```bash
-python -m remoteradar.extract.remotive
-python -m remoteradar.extract.remoteok
-python -m remoteradar.extract.adzuna
-```
+The Prefect flow keeps exactly these semantics, adding retries, scheduling
+and observability on top.
 
 ## Transformations (dbt)
 
@@ -323,6 +344,77 @@ pipeline + dbt run. Notes:
   `postgresql+psycopg://` so validation uses the psycopg v3 driver the
   project already depends on (no psycopg2 needed).
 
+## Orchestration (Prefect)
+
+The orchestration layer lives in
+[`src/remoteradar/orchestration/flow.py`](src/remoteradar/orchestration/flow.py)
+and uses **Prefect 3.x**. The `remoteradar-etl` flow wraps the existing
+stages in tasks:
+
+| Task | What it does | Failure behaviour |
+| ---- | ------------ | ----------------- |
+| `extract_and_load` (×3, one per source) | Reuses `remoteradar.pipeline.run_source` to extract one source and store its payload in `raw.*` | Prefect-native retries: 3 attempts total, exponential backoff (~10s, ~20s) with jitter. A source that exhausts its retries is recorded and the flow moves on. |
+| `run_dbt_models` | Shells out to the `dbt` executable (the venv's one, or PATH): `dbt run --project-dir transform --profiles-dir transform` | Non-zero exit fails the task with dbt's output in the logs. No retries — dbt failures are deterministic. |
+| `run_quality_checks` | Calls `remoteradar.validate.run_checks` and logs the full report | Any failed or erroring check fails the task (same gate as `remoteradar-validate`). |
+
+Design notes (also documented in the module docstring):
+
+- **One task per source, no duplicated loop.** `pipeline.py` exposes
+  `run_source` (the single-source unit of work) which both `run_pipeline`
+  (CLI) and the flow share; the flow does not call `run_pipeline`, because
+  its loop and error swallowing would duplicate what Prefect tasks do
+  natively — and each source gets its own task run, retries and logs in the
+  Prefect UI.
+- **Partial failure: dbt and validation still run.** If at least one source
+  succeeded, `run_dbt_models` and `run_quality_checks` run anyway — partial
+  data is worth more than no data, and the staging models dedupe by latest
+  ingestion, so the marts stay consistent with the freshest data available.
+  Only if **all** sources fail does the flow raise `PipelineError` and skip
+  dbt/validation entirely (nothing new to transform).
+- **No secrets in Prefect parameters.** Flow/task parameters are stored by
+  Prefect Cloud, so the connection string never travels through them: every
+  task reads `DATABASE_URL` / `DBT_PG_*` from the environment. The flow
+  loads `.env` at start — which also means the `DBT_PG_*` values in `.env`
+  reach the dbt subprocess, no manual exporting needed (unlike running dbt
+  by hand).
+- **Deployment via `flow.serve()` instead of `prefect.yaml`.** Serving needs
+  no work pool or separate worker: one long-lived process hosts the daily
+  schedule (cron `0 6 * * *`, `America/Sao_Paulo`) and executes the runs —
+  the right size for a free-tier, single-machine setup. A worker-based
+  `prefect.yaml` only pays off with remote infrastructure; Phase 7 (GitHub
+  Actions) may revisit that.
+
+### Activating it with Prefect Cloud
+
+> These steps require real credentials: a Prefect Cloud account (free tier)
+> and a reachable PostgreSQL with the raw tables created and the dbt seed
+> loaded. Without them the flow *starts* but fails in the extraction/load,
+> dbt or validation tasks — expected at this point of the project, where no
+> real warehouse has been provisioned yet.
+
+```bash
+# 1. Authenticate this machine against your Prefect Cloud workspace
+#    (paste the API key created in the Cloud UI when prompted).
+prefect cloud login
+
+# 2. One-off setup, if not done yet: raw tables + dbt seed
+psql "$DATABASE_URL" -f sql/001_create_raw_remotive_jobs.sql   # ...002, 003
+cd transform && dbt seed && cd ..
+
+# 3. Run the flow once, manually — it appears as a flow run in the Cloud UI
+python -m remoteradar.orchestration.flow    # or: remoteradar-flow
+
+# 4. Serve the scheduled deployment (blocks; keep the process running)
+remoteradar-flow --serve
+```
+
+`--serve` registers the `remoteradar-daily` deployment in your workspace
+with the daily cron schedule and keeps executing scheduled (and UI-triggered)
+runs until the process is stopped — from the Cloud UI you can then trigger
+runs, pause the schedule, or re-run a subset of sources via the flow's
+`sources` parameter. Run it from the repository root: the dbt project
+directory and the `.env` file are resolved from the checkout.
+
 ## Tests and lint
 
 ```bash
@@ -331,8 +423,10 @@ ruff check .
 ```
 
 `pytest` covers the extractors and pipeline (with mocked HTTP), the
-warehouse check registry and the expectation suite logic tests against the
-sample fixtures — none of it needs a database or network access.
+warehouse check registry, the expectation suite logic tests against the
+sample fixtures, and the Prefect flow (run against a temporary local Prefect
+API with the source/dbt/validation stages faked) — none of it needs a real
+database, network access or Prefect Cloud credentials.
 
 ## License
 
