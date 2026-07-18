@@ -1,0 +1,61 @@
+[
+  {
+    "id": 1,
+    "ingested_at": "2026-07-01T06:00:00+00:00",
+    "source": "remotive",
+    "payload": {
+      "job-count": 2,
+      "source": "remotive",
+      "categories-succeeded": ["software-dev"],
+      "categories-failed": [],
+      "jobs": [
+        {
+          "id": 101,
+          "title": "Senior Backend Engineer",
+          "company_name": "Acme Inc",
+          "category": "Software Development",
+          "tags": ["python", "postgresql"],
+          "candidate_required_location": "Worldwide",
+          "salary": "",
+          "publication_date": "2026-06-28T12:30:00",
+          "url": "https://remotive.com/remote-jobs/101"
+        },
+        {
+          "id": 102,
+          "title": "Data Engineer",
+          "company_name": "Beta Labs",
+          "category": "Data",
+          "tags": ["python", "dbt", "sql"],
+          "candidate_required_location": "Europe",
+          "salary": "$90k - $120k",
+          "publication_date": "2026-06-30T08:00:00",
+          "url": "https://remotive.com/remote-jobs/102"
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "ingested_at": "2026-07-08T06:00:00+00:00",
+    "source": "remotive",
+    "payload": {
+      "job-count": 1,
+      "source": "remotive",
+      "categories-succeeded": ["data"],
+      "categories-failed": ["devops-sysadmin"],
+      "jobs": [
+        {
+          "id": 102,
+          "title": "Data Engineer",
+          "company_name": "Beta Labs",
+          "category": "Data",
+          "tags": ["python", "dbt", "sql"],
+          "candidate_required_location": "Europe",
+          "salary": "$90k - $120k",
+          "publication_date": "2026-06-30T08:00:00",
+          "url": "https://remotive.com/remote-jobs/102"
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,5 @@
+job_id,source,title,company,category,location,salary_min,salary_max,salary_text,published_at,url
+101,remotive,Senior Backend Engineer,Acme Inc,Software Development,Worldwide,,,,2026-06-28T12:30:00+00:00,https://remotive.com/remote-jobs/101
+102,remotive,Data Engineer,Beta Labs,Data,Europe,,,$90k - $120k,2026-06-30T08:00:00+00:00,https://remotive.com/remote-jobs/102
+103,remotive,DevOps Engineer,Gamma GmbH,DevOps / Sysadmin,Europe,,,,,https://remotive.com/remote-jobs/103
+204,remotive,Frontend Developer,Acme Inc,Software Development,USA Only,,,,2026-05-15T09:45:00+00:00,https://remotive.com/remote-jobs/204

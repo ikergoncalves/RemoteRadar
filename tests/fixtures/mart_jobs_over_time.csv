@@ -1,0 +1,7 @@
+grouping_level,week_start,source,skill,job_count
+source,2026-06-22,remotive,,12
+source,2026-06-29,remotive,,9
+source,2026-06-29,remoteok,,15
+source_skill,2026-06-22,remotive,python,4
+source_skill,2026-06-29,remoteok,python,7
+source_skill,2026-06-29,remoteok,devops,3

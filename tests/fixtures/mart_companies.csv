@@ -1,0 +1,4 @@
+company_key,company,job_count,source_count,sources,first_published_at,last_published_at
+acme inc,Acme Inc,5,2,"adzuna, remotive",2026-05-15T09:45:00+00:00,2026-06-28T12:30:00+00:00
+beta labs,Beta Labs,2,1,remotive,2026-06-30T08:00:00+00:00,2026-06-30T08:00:00+00:00
+gamma gmbh,Gamma GmbH,1,1,remoteok,2026-06-20T10:00:00+00:00,2026-06-20T10:00:00+00:00
