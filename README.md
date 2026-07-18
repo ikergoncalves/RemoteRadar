@@ -1,20 +1,21 @@
 # RemoteRadar
 
 Python ETL pipeline that collects remote tech job postings from public APIs,
-cleans and transforms the data, loads it into a PostgreSQL data warehouse and —
-in upcoming phases — powers a trends dashboard: most requested languages,
-salary ranges, companies hiring remote the most, and evolution over time.
+cleans and transforms the data, loads it into a PostgreSQL data warehouse and
+powers a Streamlit trends dashboard: most requested languages, salary ranges,
+companies hiring remote the most, and evolution over time.
 
-> **Phased project.** This is Phase 5 of 7: three extraction sources
+> **Phased project.** This is Phase 6 of 7: three extraction sources
 > (Remotive, RemoteOK, Adzuna) landing raw JSONB payloads in PostgreSQL, a
 > pipeline CLI that orchestrates them with partial-failure tolerance, a
 > dbt project with staging models plus an analytics layer — currency-
 > normalized jobs, skills, salary ranges, top remote companies and postings
 > over time — a data quality layer with Great Expectations validating
-> every warehouse layer, testable locally without a database, and a Prefect
+> every warehouse layer, testable locally without a database, a Prefect
 > flow orchestrating the whole run (extract + load, dbt, validation) with a
-> daily schedule ready for Prefect Cloud. The dashboard and CI arrive in the
-> next phases.
+> daily schedule ready for Prefect Cloud, and a Streamlit dashboard over the
+> dbt marts with a built-in demo mode, ready for Streamlit Community Cloud.
+> CI arrives in the next phase.
 
 ## Planned stack
 
@@ -47,6 +48,11 @@ remoteradar/
 │       ├── remotive.py      # Remotive API extraction
 │       ├── remoteok.py      # RemoteOK API extraction
 │       └── adzuna.py        # Adzuna API extraction
+├── dashboard/               # Streamlit dashboard (kept outside src/, see its section)
+│   ├── app.py               # UI entrypoint: streamlit run dashboard/app.py
+│   ├── data.py              # Data layer: mart loading, demo fallback, shaping (no Streamlit)
+│   ├── requirements.txt     # Community Cloud deploy manifest (dashboard-only deps)
+│   └── sample_data/         # Synthetic mart CSVs powering the demo mode
 ├── sql/                     # Landing table DDL (one file per source)
 ├── transform/               # dbt project (staging + analytics layers)
 │   ├── dbt_project.yml
@@ -92,7 +98,8 @@ python -m venv .venv
 # source .venv/bin/activate   # Linux/macOS
 
 # 2. Install the project with development dependencies
-pip install -e ".[dev]"
+#    (add the dashboard extra if you want to run the Streamlit app locally)
+pip install -e ".[dev,dashboard]"
 
 # 3. Configure environment variables
 # Copy .env.example to .env and fill in the values (see table below)
@@ -102,7 +109,7 @@ pip install -e ".[dev]"
 
 | Variable           | Required     | Description                                                              |
 | ------------------ | ------------ | ------------------------------------------------------------------------ |
-| `DATABASE_URL`     | Yes (load, validate) | PostgreSQL connection string (`postgresql://user:pass@host:5432/db`) |
+| `DATABASE_URL`     | Yes (load, validate) | PostgreSQL connection string (`postgresql://user:pass@host:5432/db`). Optional for the dashboard: without it the app runs in demo mode |
 | `ADZUNA_APP_ID`    | Yes (Adzuna) | Adzuna application id — register free at <https://developer.adzuna.com/> |
 | `ADZUNA_APP_KEY`   | Yes (Adzuna) | Adzuna application key                                                   |
 | `ADZUNA_COUNTRY`   | No           | Country for Adzuna searches (default: `gb`, Adzuna's deepest market)     |
@@ -415,6 +422,96 @@ runs, pause the schedule, or re-run a subset of sources via the flow's
 `sources` parameter. Run it from the repository root: the dbt project
 directory and the `.env` file are resolved from the checkout.
 
+## Dashboard (Streamlit)
+
+The dashboard reads the four dbt marts and shows the project's headline
+questions: most requested skills (`mart_skills`), salary ranges in USD
+(`mart_salary_ranges`), companies hiring remote the most (`mart_companies`)
+and postings over time (`mart_jobs_over_time`), with source/skill filters,
+KPI tiles and a table view under every chart.
+
+```bash
+# from the repository root (same working directory Community Cloud uses)
+pip install -e ".[dev,dashboard]"
+streamlit run dashboard/app.py
+```
+
+The code is split so the visual layer stays untested-by-design while the
+logic is fully testable: `dashboard/data.py` holds every loading and shaping
+function (plain pandas in, plot-ready pandas out — no Streamlit imports) and
+`dashboard/app.py` only renders. The package intentionally does **not**
+import `remoteradar`, so the Community Cloud deploy needs none of the
+pipeline's heavy dependencies (Prefect, Great Expectations, dbt).
+
+Two honesty rules are built in. First, every salary view names the
+`grouping_level` it displays and never re-aggregates the mart's
+pre-computed averages; the "source × confidence" grain colors each point by
+`salary_source` and marks fixed-rate currency conversions with **≈**
+(the fixed FX seed is a documented limitation, and Remotive is absent from
+salary views because it only publishes free-text salaries). Second, the data
+mode is always visible (see below).
+
+### Demo mode vs live mode
+
+On startup the app resolves `DATABASE_URL` (environment, `.env`, or
+Streamlit secrets — root-level secrets are exposed as environment
+variables). If it is set and the warehouse answers, the app reads the marts
+from `DBT_PG_SCHEMA` (default `analytics`) and shows a green **Live mode**
+banner. If it is missing, or the connection/query fails for any reason, the
+app falls back to the synthetic sample marts bundled in
+`dashboard/sample_data/` and shows a yellow **Demo mode** banner stating the
+reason — so a portfolio visitor can explore every chart without a database,
+and can never mistake sample numbers for real ones. The sample CSVs were
+generated from one coherent synthetic jobs table (counts add up across
+grouping levels) and mirror the real mart schemas exactly; they are not the
+test fixtures, which contain deliberate corruptions.
+
+### Deploying to Streamlit Community Cloud
+
+Verified against the Community Cloud docs (July 2026). Requirements this
+repo already satisfies:
+
+- **Dependencies** — Cloud looks for a dependency file first in the
+  entrypoint's directory, then at the repo root (precedence:
+  `uv.lock` > `Pipfile` > `environment.yml` > `requirements.txt` >
+  `pyproject.toml`). `dashboard/requirements.txt` sits next to the
+  entrypoint, so it wins over the root `pyproject.toml` and keeps the
+  deploy lean.
+- **Working directory** — Cloud clones the repo and runs
+  `streamlit run` from its root; the app resolves paths and imports
+  relative to itself, so a subdirectory entrypoint is fine.
+- **System packages / config** — no `packages.txt` (apt) needed; a
+  `.streamlit/config.toml` would have to live at the repo root, but the
+  defaults are fine.
+
+Steps, once you have an account:
+
+1. Sign in at <https://share.streamlit.io> with GitHub and authorize the
+   repository.
+2. **Create app → Deploy a public app from GitHub**, pick this repo, branch
+   `main`, main file path `dashboard/app.py`.
+3. In **Advanced settings**, select the Python version you develop with
+   (3.13 for this repo — always match local and deploy versions), and
+   optionally paste secrets in TOML form to enable live mode:
+
+   ```toml
+   DATABASE_URL = "postgresql://user:password@host:5432/dbname"
+   DBT_PG_SCHEMA = "analytics"
+   ```
+
+   With no secrets the app deploys in demo mode, which is a perfectly valid
+   portfolio setup until the warehouse exists.
+4. Deploy. Pushes to `main` redeploy automatically; secrets can be changed
+   later under the app's **Settings → Secrets**.
+
+### Data source credits
+
+Job data comes from [Remote OK](https://remoteok.com),
+[Remotive](https://remotive.com) and [Adzuna](https://www.adzuna.com). The
+dashboard footer links back to all three; the Remote OK link-back and
+mention are **required** by its API terms (the API response itself carries
+the legal notice), so keep that attribution visible in any fork or deploy.
+
 ## Tests and lint
 
 ```bash
@@ -424,9 +521,11 @@ ruff check .
 
 `pytest` covers the extractors and pipeline (with mocked HTTP), the
 warehouse check registry, the expectation suite logic tests against the
-sample fixtures, and the Prefect flow (run against a temporary local Prefect
-API with the source/dbt/validation stages faked) — none of it needs a real
-database, network access or Prefect Cloud credentials.
+sample fixtures, the Prefect flow (run against a temporary local Prefect
+API with the source/dbt/validation stages faked), and the dashboard data
+layer (demo fallback, grouping-level selection and chart shaping, run
+against the bundled sample marts) — none of it needs a real database,
+network access, Prefect Cloud credentials or a running Streamlit server.
 
 ## License
 
