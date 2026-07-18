@@ -1,0 +1,12 @@
+# Dependency manifest for the Streamlit Community Cloud deploy of
+# dashboard/app.py. It lives next to the entrypoint on purpose: Community
+# Cloud looks for dependency files in the entrypoint's directory before the
+# repository root, so this file wins over the root pyproject.toml and keeps
+# the deploy free of the pipeline's heavy dependencies (Prefect, Great
+# Expectations, dbt). For local development use `pip install -e ".[dev,dashboard]"`.
+streamlit>=1.37
+pandas>=2.0
+altair>=5.0
+sqlalchemy>=2.0
+psycopg[binary]>=3.1
+python-dotenv>=1.0
