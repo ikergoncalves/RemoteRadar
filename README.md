@@ -5,13 +5,14 @@ cleans and transforms the data, loads it into a PostgreSQL data warehouse and �
 in upcoming phases — powers a trends dashboard: most requested languages,
 salary ranges, companies hiring remote the most, and evolution over time.
 
-> **Phased project.** This is Phase 3 of 7: three extraction sources
+> **Phased project.** This is Phase 4 of 7: three extraction sources
 > (Remotive, RemoteOK, Adzuna) landing raw JSONB payloads in PostgreSQL, a
-> pipeline CLI that orchestrates them with partial-failure tolerance, and a
+> pipeline CLI that orchestrates them with partial-failure tolerance, a
 > dbt project with staging models plus an analytics layer — currency-
 > normalized jobs, skills, salary ranges, top remote companies and postings
-> over time. Orchestration with Prefect, data quality checks and the
-> dashboard arrive in the next phases.
+> over time — and a data quality layer with Great Expectations validating
+> every warehouse layer, testable locally without a database. Orchestration
+> with Prefect and the dashboard arrive in the next phases.
 
 ## Planned stack
 
@@ -34,6 +35,10 @@ remoteradar/
 │   ├── config.py            # Environment variable handling (.env)
 │   ├── load.py              # Raw payload loading into PostgreSQL
 │   ├── pipeline.py          # CLI orchestrating all extractions
+│   ├── validate.py          # CLI running the quality suites against the warehouse
+│   ├── quality/             # Great Expectations home: suites + check registry
+│   │   ├── suites.py        # Expectation suites (raw, staging, marts), documented
+│   │   └── checks.py        # Suite <-> warehouse table/query bindings
 │   └── extract/
 │       ├── remotive.py      # Remotive API extraction
 │       ├── remoteok.py      # RemoteOK API extraction
@@ -49,6 +54,7 @@ remoteradar/
 │       ├── intermediate/    # int_jobs_normalized (all sources unified, salaries in USD)
 │       └── marts/           # mart_skills, mart_salary_ranges, mart_companies, mart_jobs_over_time
 ├── tests/                   # Tests with mocked HTTP (never hits the real APIs)
+│   └── fixtures/            # Sample data (one table per layer) for the quality logic tests
 ├── .env.example             # Documented environment variables
 └── pyproject.toml           # Dependencies and tool configuration
 ```
@@ -92,14 +98,14 @@ pip install -e ".[dev]"
 
 | Variable           | Required     | Description                                                              |
 | ------------------ | ------------ | ------------------------------------------------------------------------ |
-| `DATABASE_URL`     | Yes (load)   | PostgreSQL connection string (`postgresql://user:pass@host:5432/db`)     |
+| `DATABASE_URL`     | Yes (load, validate) | PostgreSQL connection string (`postgresql://user:pass@host:5432/db`) |
 | `ADZUNA_APP_ID`    | Yes (Adzuna) | Adzuna application id — register free at <https://developer.adzuna.com/> |
 | `ADZUNA_APP_KEY`   | Yes (Adzuna) | Adzuna application key                                                   |
 | `ADZUNA_COUNTRY`   | No           | Country for Adzuna searches (default: `gb`, Adzuna's deepest market)     |
 | `REMOTIVE_API_URL` | No           | Remotive API base URL (default: public endpoint)                         |
 | `REMOTEOK_API_URL` | No           | RemoteOK API base URL (default: public endpoint)                         |
 | `ADZUNA_API_URL`   | No           | Adzuna API base URL (default: public endpoint)                           |
-| `DBT_PG_*`         | Yes (dbt)    | Warehouse connection for dbt — see the dbt section below                 |
+| `DBT_PG_*`         | Yes (dbt)    | Warehouse connection for dbt — see the dbt section below (`DBT_PG_SCHEMA` is also read by `remoteradar-validate` to locate the dbt models) |
 
 ### Create the raw tables in PostgreSQL
 
@@ -216,12 +222,117 @@ tables created; `dbt parse` validates the project without a database.
   `mart_jobs_over_time` only covers the weeks the sources happen to list —
   the structure matters more than the volume for now.
 
-### Tests and lint
+## Data quality (Great Expectations)
+
+The quality layer lives in
+[`src/remoteradar/quality/`](src/remoteradar/quality/) and uses
+**Great Expectations Core 1.x** with the modern Fluent API: suites are
+defined as Python code and executed against ephemeral Data Contexts.
+
+**Layout decision.** There is deliberately no scaffolded `gx/` directory at
+the repository root (the old `great_expectations init` workflow). A
+file-based Data Context stores serialized YAML/JSON copies of the suites,
+which would be a second source of truth drifting away from code review.
+Defining the suites as code in `remoteradar.quality` keeps a single
+reviewable definition that both consumers import: the warehouse validation
+CLI and the local Pytest logic tests.
+
+### Why a second validation layer next to the dbt tests
+
+Some expectations intentionally overlap with the dbt tests in `transform/`
+(e.g. `job_id` not-null/unique). This is not useless duplication:
+
+- dbt tests validate models **while dbt builds them**, from inside the
+  transformation tool. The GX suites validate the **materialized data from
+  outside**, sharing no machinery with dbt — a broken dbt test, an edited
+  `schema.yml` or a run that skipped tests cannot silently disable the
+  quality gate.
+- They run at different moments: dbt tests during `dbt test`, GX after the
+  whole pipeline (and, in later phases, from Prefect and GitHub Actions
+  before the dashboard reads the marts).
+- GX also covers what dbt tests structurally cannot: the raw landing layer
+  (payload/job-count coherence happens before dbt ever runs).
+
+### Expectation suites
+
+Each suite is built by a documented function in
+[`quality/suites.py`](src/remoteradar/quality/suites.py);
+[`quality/checks.py`](src/remoteradar/quality/checks.py) maps suites to
+warehouse tables.
+
+| Suite | Runs against | What it checks and why |
+| ----- | ------------ | ---------------------- |
+| `raw_jobs` | `raw.remotive_jobs`, `raw.remoteok_jobs`, `raw.adzuna_jobs` (via a SQL projection deriving job-count columns from the JSONB) | `payload` and `ingested_at` never null; `ingested_at` not in the future (5 min clock-skew tolerance) and not before the project existed — future/past values would corrupt the staging dedup-by-latest-ingestion; the payload's declared `job-count` equals the actual length of its `jobs` array — a mismatch means a truncated payload or an extractor regression. |
+| `staging_jobs` | `stg_remotive_jobs`, `stg_remoteok_jobs`, `stg_adzuna_jobs` | `job_id` never null and unique within each view (cross-source collisions are handled by `job_key` downstream); `title` never null; `published_at`, when present, between 2015-01-01 and now+1 day — values outside that window mean timestamp-parsing drift, while nulls stay allowed (not every source dates every job). |
+| `mart_salary_ranges` | `mart_salary_ranges` | `grouping_level` only takes its three documented grains (the dashboard filters on it); `job_count >= 1` (every row aggregates at least one job); `min_salary_usd <= max_salary_usd` when both bounds are present — the dbt `min_not_greater_than_max` test asserted on the materialized table. |
+| `mart_companies` | `mart_companies` | `company_key` never null and unique (it is the mart's grouping key); `job_count >= 1`. |
+| `mart_jobs_over_time` | `mart_jobs_over_time` | `grouping_level` only takes its two documented grains; `week_start` never null (jobs without `published_at` must have been filtered out); `job_count >= 1`. |
+
+### Test the suites locally (no database needed)
+
+The regular test run already does it:
+
+```bash
+pytest
+```
+
+[`tests/test_quality_suites.py`](tests/test_quality_suites.py) runs every
+suite against small sample datasets in
+[`tests/fixtures/`](tests/fixtures/) — one table per layer (raw payload
+JSON, staging CSV, one CSV per mart) loaded as pandas DataFrames. Healthy
+fixtures must pass their suite, and each targeted corruption (duplicate
+ids, future timestamps, job-count mismatches, `min > max`, unknown
+`grouping_level`…) must fail exactly the expectation that guards it.
+
+> **Scope:** these tests validate the *logic* of the expectations, so the
+> suites are trustworthy before any database exists. They are **not** an
+> end-to-end validation of the warehouse — that requires the steps below
+> and is still pending in this project (no real PostgreSQL has been
+> provisioned yet).
+
+### Validate the real warehouse
+
+With `DATABASE_URL` set (and the dbt models built), run:
+
+```bash
+python -m remoteradar.validate   # or simply: remoteradar-validate
+```
+
+The CLI runs all nine checks (3 raw tables, 3 staging views, 3 marts) and
+prints one line per check plus a failure detail per broken expectation:
+
+```
+== RemoteRadar data quality report ==
+PASSED  raw_remotive_jobs (suite raw_jobs, 6/6 expectations)
+FAILED  stg_adzuna_jobs (suite staging_jobs, 3/4 expectations)
+        - expect_column_values_to_not_be_null on title: 12 unexpected value(s)
+ERROR   mart_companies (suite mart_companies)
+        relation "analytics.mart_companies" does not exist
+Summary: 7 passed, 1 failed, 1 error(s)
+```
+
+The exit code is 0 only when every check passes, so orchestration (Prefect,
+Phase 5) and CI (GitHub Actions, Phase 7) can call it as a gate after the
+pipeline + dbt run. Notes:
+
+- Checks are independent: a missing table (e.g. marts not built yet) is
+  reported as `ERROR` and the remaining checks still run.
+- The staging views and marts are read from the schema in `DBT_PG_SCHEMA`
+  (default `analytics`), matching wherever dbt materialized them.
+- Plain `postgresql://` connection strings are rewritten to SQLAlchemy's
+  `postgresql+psycopg://` so validation uses the psycopg v3 driver the
+  project already depends on (no psycopg2 needed).
+
+## Tests and lint
 
 ```bash
 pytest
 ruff check .
 ```
+
+`pytest` covers the extractors and pipeline (with mocked HTTP), the
+warehouse check registry and the expectation suite logic tests against the
+sample fixtures — none of it needs a database or network access.
 
 ## License
 
